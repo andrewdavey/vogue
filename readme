@@ -2,3 +2,21 @@ Vogue
 
 Copyright (c) 2011 Andrew Davey (andrew@equin.co.uk)
 MIT License
+
+Vogue creates a real-time link between your web browser and your file system. When you save 
+a CSS file, used by the HTML page in your browser, Vogue will make the browser reload the 
+stylesheet. Only the stylesheet is reloaded, not the entire page, making it work even for 
+very dynamic/ajax pages.
+
+Vogue is all javascript. There is a server running on Node.js, which will watch the file 
+system. The server accepts WebSocket connections from the client code (which uses socket.io).
+The client javascript can be loaded into a HTML page using a single <script> tag.
+
+Run the Vogue server using node.
+  node vogue.js -dir /path/to/website -port 8001
+
+  -dir is optional, defaults to the current directory.
+  -port is optional, defaults to 8001.
+
+  Open http://localhost:8001/ to see instructions for loading the Vogue client into your
+  web pages.
