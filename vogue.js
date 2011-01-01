@@ -60,6 +60,10 @@ VogueClient.prototype.handleMessage = function(message) {
 VogueClient.prototype.watchFile = function(href) {
   var filename = path.join(options.dir, href.substr(1));
   fs.stat(filename, function(err, stats) {
+    if (err) {
+      console.log('Could not read stats for ' + filename);
+      return;
+    }
     this.watchedFiles[filename] = {
       href: href,
       mtime: stats.mtime
@@ -71,6 +75,10 @@ VogueClient.prototype.updateFile = function(filename) {
   var fileInfo = this.watchedFiles[filename];
   if (fileInfo) {
     fs.stat(filename, function(err, stats) {
+      if (err) {
+        console.log('Could not read stats for ' + filename);
+        return;
+      }
       if (fileInfo.mtime < stats.mtime) {
         this.socket.send('update ' + fileInfo.href);
         fileInfo.mtime = stats.mtime;
