@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Vogue</title>
+  </head>
+  <body>
+    <h1>Vogue</h1>
+    <p>
+    Add this bookmarklet to your bookmarks. It will inject Vogue's scripts
+    into the currently running page.
+    </p>
+    <p>
+      <a id="favlet">Inject Vogue</a>
+    </p>
+    <p>
+    Or, add the following script into your HTML.
+    </p>
+    <pre>&lt;script src="http://localhost:{port}/vogue-client.js" type="text/javascript"&gt;&lt;/script&gt;</pre>
+    <p>Note: This should only appear in development-time code. Remove before going into production.</p>
+    <script type="text/javascript">
+      var favlet = document.getElementById("favlet");
+      favlet.href = "javascript:(function(){\
+var s = document.createElement('script');\
+s.setAttribute('src', 'http://localhost:{port}/vogue-client.js');\
+s.setAttribute('type', 'text/javascript');\
+document.getElementsByTagName('head')[0].appendChild(s);\
+})()".replace(/\r\n|\r|\n/g, "");
+    </script>
+  </body>
+</html>
