@@ -7,7 +7,7 @@ very dynamic/ajax pages.
 
 Vogue is all javascript. It runs a server on Node.js, which will watch the file 
 system. The server accepts WebSocket connections from the client code (which uses socket.io).
-The client javascript can be loaded into a HTML page using a single <script> tag.
+The client javascript can be loaded into a HTML page using a single script tag.
 
 ## Usage
 Run the Vogue server using node.
