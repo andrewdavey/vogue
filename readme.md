@@ -14,25 +14,26 @@ The client javascript can be loaded into a HTML page using a single script tag.
 ## Usage
 Run the Vogue server using node.
 
-`node vogue.js -dir /path/to/website -port 8001`
+    node vogue.js -dir /path/to/website -port 8001
 
-`-dir : The directory containing your website's files. Optional, defaults to the current directory.`
+-dir : The directory containing your website's files. 
+Optional, defaults to the current directory.
   
-`-port : The port used for Vogue's HTTP server. Optional, defaults to 8001.`
+-port : The port used for Vogue's HTTP server. Optional, defaults to 8001.
 
-  Open http://localhost:8001/ to see instructions for loading the Vogue client into your
-  web pages.
+Open http://localhost:8001/ to see instructions for loading the Vogue client into your
+web pages.
 
 ## Demo
 Vogue runs a separate HTTP server to the one running your website.
 To run the demo website, for example, do something like this first:
   
-``cd demo  
-python -m SimpleHTTPServer``
+    cd demo  
+    python -m SimpleHTTPServer
 
 Then, from another terminal session, run Vogue:
 
-`node src/vogue.js -dir demo`
+    node src/vogue.js -dir demo
 
 Open http://localhost:8000 (or whatever the port used by your web server is) 
 to view the demo index page. The demo page has the Vogue client javascript already included.
