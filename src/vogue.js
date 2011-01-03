@@ -11,25 +11,68 @@
 var http = require('http'),
     fs   = require('fs'),
     path = require('path'),
+    opt  = require('parseopt'),
     io   = require('socket.io');
 
-var defaultOptions = {
-  port: '8001',
-  dir: ''
-};
-var options = parseOptions(process.argv, defaultOptions);
-options.port = parseInt(options.port);
-options.dir = path.join(process.cwd(), options.dir);
+function getOptions() {
+  var parser = new opt.OptionParser({
+    options: [
+      {
+        name: ['--port', '-p'],
+          type: 'int',
+          help: 'Port to run Vogue server on',
+        default: 8001
+      },
+      {
+          name: ['--help','-h','-?'],
+        type: 'flag',
+        help: 'Show this help message',
+        onOption: function (value) {
+          if (value) {
+            parser.usage('First argument after options should be the path to the website\'s root directory. Otherwise the current directory is used.\ne.g. vogue -p 8001 ./myweb');
+          }
+          // returning true cancels any further option parsing
+          // and parser.parse() returns null
+          return value;
+        }
+      }
+    ]
+  });
 
-console.log('Watch directory: ' + options.dir);
+  var data = parser.parse();
+  if (!data) return null;
 
+  var options = data.options;
+  options.dir = path.join(
+    process.cwd(),
+    (data.arguments.length > 0) ? data.arguments[0] : ''
+  );
+  
+  try {
+    var stats = fs.statSync(options.dir);
+    if (!stats.isDirectory()) {
+      console.error('Path is not a directory: ' + options.dir);
+      process.exit(1);
+    }
+  } catch (e) {
+    console.error('Path not found: ' + options.dir);
+    process.exit(1);
+  }
 
+  return options;
+}
+
+var options = getOptions();
+if (!options) process.exit();
 
 var server = http.createServer(onWebRequest);
 server.listen(options.port);
 var socket = io.listen(server);
 var clients = [];
 var watchedFiles = {};
+
+console.log('Watching directory: ' + options.dir);
+console.log('Listening for clients: http://localhost:' + options.port + '/');
 
 socket.on('connection', function(client) {
   var vogueClient = new VogueClient(client);
@@ -132,21 +175,4 @@ function sendVogueClient(response) {
     response.write(script);
     response.end();
   });
-}
-
-function parseOptions(argv, defaults) {
-  var options = {}, nextArgName;
-  for (var p in defaults) {
-    if (defaults.hasOwnProperty(p)) options[p] = defaults[p];
-  }
-  for (var i = 0; i < argv.length; i++) {
-    if (nextArgName) {
-      options[nextArgName] = argv[i];
-      nextArgName = null;
-    }
-    if (argv[i].match(/^-./)) {
-      nextArgName = argv[i].substr(1);
-    }
-  }
-  return options;
 }
