@@ -11,15 +11,18 @@ The server accepts WebSocket connections from the client code
 (which uses [socket.io](http://socket.io/)).
 The client javascript can be loaded into a HTML page using a single script tag.
 
+## Install using npm
+Make sure you have Node.JS and [npm](http://npmjs.org/) installed.  
+Then run: 
+
+    npm install vogue
+
 ## Usage
-Run the Vogue server using node.
+Run the Vogue server.
 
-    node vogue.js -dir /path/to/website -port 8001
+    vogue --port 8001 /path/to/website
 
--dir : The directory containing your website's files. 
-Optional, defaults to the current directory.
-  
--port : The port used for Vogue's HTTP server. Optional, defaults to 8001.
+--port : The port used for Vogue's HTTP server. Optional, defaults to 8001.
 
 Open http://localhost:8001/ to see instructions for loading the Vogue client into your
 web pages.
@@ -33,7 +36,7 @@ To run the demo website, for example, do something like this first:
 
 Then, from another terminal session, run Vogue:
 
-    node src/vogue.js -dir demo
+    vogue demo
 
 Open http://localhost:8000 (or whatever the port used by your web server is) 
 to view the demo index page. The demo page has the Vogue client javascript already included.
