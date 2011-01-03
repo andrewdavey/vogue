@@ -1,50 +1,72 @@
-﻿body {
-    margin-top: 1.0em;
-    background-color: #D9EDF3;
+﻿* { padding: 0; margin: 0; }
+
+body {
+    background-color: #eee;
     font-family: Helvetica, Arial, FreeSans, sans-serif;
-    color: #000000;
 }
-#container {
+
+.section .inner {
     margin: 0 auto;
-    width: 700px;
+    width: 500px;
+    padding: 20px 0;
 }
+
 h1 {
-    font-size: 3.8em;
-    color: #5F696B;
-    margin-bottom: 3px;
+    font-size: 3em;
+    color: #777;
 }
 h2 {
     font-size: 1.5em;
-    color: #4d2f35;
+    margin-bottom: .2em;
+    color: #555;
 }
-h3 {
-    text-align: center;
-    color: #4d2f35;
+p {
+    line-height: 1.4em;
+    margin-bottom: .5em;
+    color: #333;
 }
 a {
-    color: #4d2f35;
-}
-.description {
-    font-size: 1.2em;
-    margin-bottom: 30px;
-    margin-top: 30px;
-    font-style: italic;
-}
-.download {
-    float: right;
+    color: #555;
 }
 pre {
     background: #444;
     color: #fff;
-    padding: 15px;
+    padding: .75em;
+    margin-bottom: .5em;
 }
-hr {
-    border: 0;
-    width: 80%;
-    border-bottom: 1px solid #aaa;
-}
-.footer {
-    text-align: center;
-    padding-top: 30px;
+p.tagline {
     font-style: italic;
+}
+p.creator {
+    font-size: 10pt;
+}
+
+#section-1 {
+    background-color: #E5EAFF;
+}
+#section-1 h2 {
+    color: #565E7F;
+}
+#section-2 {
+    background-color: #EEFFE5;
+}
+#section-2 h2 {
+    color: #657F56;
+}
+#section-3 {
+    background-color: #FFF7E5;
+}
+#section-3 h2 {
+    color: #7F7356;
+}
+#section-4 {
+    background-color: #FFDDDD;
+}
+#section-4 h2 {
+    color: #7F5656;
+}
+
+.footer {
+    padding-top: 1em;
+    font-size: 10pt;
 }

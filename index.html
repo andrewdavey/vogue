@@ -6,38 +6,77 @@
 </head>
 <body>
     <a href="http://github.com/andrewdavey/vogue">
-        <img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"
-            alt="Fork me on GitHub" />
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" />
     </a>
+
     <div id="container">
+        <div class="section" id="section-0">
+        <div class="inner">
         <h1>Vogue</h1>
-        <p>Auto-reload stylesheets whenever CSS files are saved.</p>
-        <p>by <a href="http://aboutcode.net/">Andrew Davey</a></p>
-        
-        <h2>Watch Vogue in action</h2>
-        <p><a href="http://screencast.com/t/kf1FDO1y5B">Two minute screencast</a> showing life without and then with Vogue.</p>
-        
+        <p class="tagline">Auto-reload stylesheets whenever CSS files are saved.</p>
+        <p class="creator">Created by <a href="http://aboutcode.net/">Andrew Davey</a></p>
+        </div>
+        </div>
+
+        <div class="section" id="section-1">
+        <div class="inner">
+        <h2>Do you create websites?</h2>
+        <p>Are you tired of constantly <em>editing</em> CSS, <em>switching</em> to your
+        browser, <em>reloading</em> to see the changes and then doing that <em>over and over</em>?
+        </p>
+        <p>Vogue removes this hassle.</p>
+        <p>As soon as you save changes to a CSS file, Vogue tells any web
+        browsers using it to reload the stylesheet. Only the stylesheet 
+        is reloaded, not the full page. Vogue works in all browsers and even multiple browsers at the same time!</p>
+        <p><a href="http://screencast.com/t/kf1FDO1y5B" target="_blank">Watch this 2-minute screencast</a> showing a better life with Vogue.</p>
+        </div>
+        </div>
+
+        <div class="section" id="section-2">
+        <div class="inner">
         <h2>Install</h2>
-        <p>You will need to have <a href="http://nodejs.org/">NodeJS</a> and <a href="http://npmjs.org/" title="Node Package Manager">npm</a> installed.</p>
-        <p>Install with a simple:</p>
-        <code><pre>npm install vogue</pre></code>
+        <p>You will need to have <a href="http://nodejs.org/" title="Javascript all the way, baby!">NodeJS</a> and <a href="http://npmjs.org/" title="Node Package Manager">npm</a> installed.</p>
+        <p>Install vogue with:</p>
+        <code><pre>$ npm install vogue</pre></code>
         <p>Yep, that's it.</p>
+        </div>
+        </div>
 
+        <div class="section" id="section-3">
+        <div class="inner">
         <h2>Usage</h2>
-        <p>Start Vogue by running a command like this:</p>
-        <code><pre>vogue path/to/website</pre></code>
-        <p>This runs an HTTP server on port 8001.</p>
-        <p>You can also specify the port:</p>
-        <code><pre>vogue --port 1234 path/to/website</pre></code>
+        <p>Start the Vogue HTTP server by running this:</p>
+        <code><pre>$ vogue path/to/website</pre></code>
+        <p>View <samp>http://localhost:8001/</samp> to see how to enable Vogue in your web pages. Basically, add this into your HTML:</p>
+        <code><pre>&lt;script src="http://localhost:8001/vogue-client.js" 
+        type="text/javascript"&gt;
+&lt;/script&gt;</pre></code>
+        <p>You can either add it manually, or use the bookmarklet, found on <samp>http://localhost:8001/</samp>, to inject the script.</p>
+        <p>Run your website's own local server (Vogue <em>does not</em> host your website - just it's own small bit of magic).</p>
+        <p>View your website in a web browser. Then open its CSS files in your favorite editor. Make a change and save. The change will be immediately reflected in the browser!</p>
+        <p>Finally, follow <a href="http://twitter.com/andrewdavey">Andrew on Twitter</a> and tell him what you think about Vogue!</p>
+        </div>
+        </div>
 
+        <div class="section" id="section-4">
+        <div class="inner">
         <h2>Fork me! That's some tasty open source</h2>
-        <p>Vogue is built on some epic open source projects (NodeJS, npm, <a href="http://socket.io/">socket.io</a>, et al).</p>
-        <p>So of course Vogue is also open source (MIT License). Head over to GitHub to get the code:</p>
-        <p><a href="http://github.com/andrewdavey/vogue">andrewdavey/vogue</a></p>
+        <p>Vogue is built on buzzwork-compliant, open source projects such as NodeJS, npm, <a href="http://socket.io/">socket.io</a>, et al.</p>
+        <p>Therefore Vogue is also open source (MIT License). Head over to GitHub to get the code:</p>
+        <p><a href="http://github.com/andrewdavey/vogue">github.com/andrewdavey/vogue</a></p>
         <p>
             You can also clone the project with <a href="http://git-scm.com">Git</a> by running:
             <pre>$ git clone git://github.com/andrewdavey/vogue</pre>
         </p>
+        </div>
+        </div>
+
+        <div class="section footer">
+        <div class="inner">
+        <p><a href="http://twitter.com/andrewdavey">Follow Andrew Davey on Twitter</a></p>
+        <p>Copyright &copy; 2011 Andrew Davey (andrew@equin.co.uk)</p>
+        </div>
+        </div>
     </div>
 </body>
 </html>
