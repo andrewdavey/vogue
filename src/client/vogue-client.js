@@ -13,6 +13,7 @@ loadScripts({
 
 function vogue() {
   var stylesheets = getLocalStylesheets();
+  WEB_SOCKET_SWF_LOCATION = 'http://localhost:{port}/socket.io/lib/vendor/web-socket-js/WebSocketMain.swf';
   var socket = new io.Socket('localhost', { port: {port} });
   socket.on('connect', watchAllStylesheets);
   socket.on('message', handleMessage);
