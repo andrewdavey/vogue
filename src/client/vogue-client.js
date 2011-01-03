@@ -72,12 +72,13 @@ function loadScripts(scripts, loadedCallback) {
 
   var count = srcs.length;
   if (count == 0) loadedCallback();
-  srcs.forEach(function(src) {
+  for (var i = 0; i < srcs.length; i++) {
+    var src = srcs[i];
     loadScript(src, function() {
       count--;
       if (count == 0) loadedCallback();
     });
-  });
+  }
 }
 
 function loadScript(src, loadedCallback) {
@@ -86,7 +87,7 @@ function loadScript(src, loadedCallback) {
   script.setAttribute('src', src);
   script.onload = loadedCallback; // Chrome
   script.onreadystatechange = function () { // IE?
-    if (this.readyState == 'complete') loadedCallback();
+    if (this.readyState == 'complete' || this.readyState == 'loaded') loadedCallback();
   }
   document.getElementsByTagName('head')[0].appendChild(script);
 }
