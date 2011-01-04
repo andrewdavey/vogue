@@ -101,7 +101,7 @@ VogueClient.prototype.handleMessage = function(message) {
   this.watchFile(match[1]);  
 };
 VogueClient.prototype.watchFile = function(href) {
-  var filename = path.join(options.dir, href.substr(1));
+  var filename = path.join(options.dir, href.substr(1)).split('?')[0];
   fs.stat(filename, function(err, stats) {
     if (err) {
       console.log('Could not read stats for ' + filename);
