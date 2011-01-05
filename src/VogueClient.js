@@ -20,11 +20,18 @@ VogueClient.prototype.handleMessage = function(message) {
 };
 
 VogueClient.prototype.watchFile = function(href) {
-  this.watcher.startWatchingByHref(href, function(filename, stats) {
+  var filename = this.watcher.getFilenameForHref(href);
+  fs.stat(filename, function(err, stats) {
+    if (err) {
+      console.log('Could not read stats for ' + filename);
+      return;
+    }
+    
     this.watchedFiles[filename] = {
       href: href,
       mtime: stats.mtime
     };
+    this.watcher.startWatching(filename);
   }.bind(this));
 };
 

@@ -21,20 +21,12 @@ Watcher.prototype.removeClient = function(client) {
   this.clients.splice(this.clients.indexOf(client), 1);
 };
 
-Watcher.prototype.startWatchingByHref = function(href, callback) {
+Watcher.prototype.getFilenameForHref = function(href) {
   // Remove any querystring junk.
   // e.g. "foo/bar.css?abc=123" --> "foo/bar.css"
   href = href.split('?')[0];
   var filename = path.join(this.webDirectory, href);
-  fs.stat(filename, function(err, stats) {
-    if (err) {
-      console.log('Could not read stats for ' + filename);
-      return;
-    }
-
-    this.startWatching(filename);
-    callback(filename, stats);
-  }.bind(this));
+  return filename;
 };
 
 Watcher.prototype.startWatching = function(filename) {
