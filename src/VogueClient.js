@@ -1,3 +1,7 @@
+var fs = require('fs');
+
+exports.VogueClient = VogueClient;
+
 // Encapsulates a web socket client connection from a web browser.
 function VogueClient(clientSocket, watcher) {
   this.socket = clientSocket;
@@ -11,21 +15,16 @@ function VogueClient(clientSocket, watcher) {
 VogueClient.prototype.handleMessage = function(message) {
   var match = message.match(/^watch (.*)$/);
   if (!match) return;
-  this.watchFile(match[1]);
+  var href = match[1];
+  this.watchFile(href);
 };
 
 VogueClient.prototype.watchFile = function(href) {
-  var filename = path.join(options.dir, href.substr(1));
-  fs.stat(filename, function(err, stats) {
-    if (err) {
-      console.log('Could not read stats for ' + filename);
-      return;
-    }
+  this.watcher.startWatchingByHref(href, function(filename, stats) {
     this.watchedFiles[filename] = {
       href: href,
       mtime: stats.mtime
     };
-    this.watcher.startWatching(filename);
   }.bind(this));
 };
 
@@ -37,6 +36,8 @@ VogueClient.prototype.updateFile = function(filename) {
         console.error('Could not read stats for file: ' + filename);
         return;
       }
+      // Only send message to client if the file was modified
+      // since we last saw it.
       if (fileInfo.mtime < stats.mtime) {
         this.socket.send('update ' + fileInfo.href);
         fileInfo.mtime = stats.mtime;
@@ -51,5 +52,3 @@ VogueClient.prototype.disconnect = function() {
   }
   this.watcher.removeClient(this);
 };
-
-exports.VogueClient = VogueClient;

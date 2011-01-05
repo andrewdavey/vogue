@@ -12,23 +12,16 @@ loadScripts({
 }, vogue);
 
 function vogue() {
-  var stylesheets = getLocalStylesheets();
   WEB_SOCKET_SWF_LOCATION = 'http://localhost:{port}/socket.io/lib/vendor/web-socket-js/WebSocketMain.swf';
+  var stylesheets = getLocalStylesheets();
   var socket = new io.Socket('localhost', { port: {port} });
   socket.on('connect', watchAllStylesheets);
   socket.on('message', handleMessage);
   socket.connect();
 
   function watchAllStylesheets() {
-    var origin = document.location.protocol + '//' + document.location.host;
-    var skipPrefixLength = origin.length;
     for (var href in stylesheets) {
-      // linkElement.href is resolved by the browser to the full URL.
-      // (unlike reading the actual attribute value.)
-      // Very handy; we can easily get the full path segment of the URL
-      // by skipping the current document's location origin length.
-      var path = stylesheets[href].href.substr(skipPrefixLength);
-      socket.send('watch ' + path);
+      socket.send('watch ' + href);
     }
   }
 
@@ -51,9 +44,14 @@ function vogue() {
   function getLocalStylesheets() {
     var links = $('link[type=text/css][href]').filter(isLocal);
     var origin = document.location.protocol + '//' + document.location.host;
+    var skipPrefixLength = origin.length + 1; // The +1 removes the leading '/' character.
     var stylesheets = {};
     links.each(function() {
-      var href = this.href.substr(origin.length)
+      // linkElement.href is resolved by the browser to the full URL.
+      // (unlike reading the actual attribute value.)
+      // Very handy; we can easily get the full path segment of the URL
+      // by skipping the current document's location origin length.
+      var href = this.href.substr(skipPrefixLength);
       stylesheets[href] = this;
     });
     return stylesheets;

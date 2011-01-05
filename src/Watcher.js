@@ -1,4 +1,11 @@
-function Watcher() {
+var fs   = require('fs')
+  , path = require('path');
+
+exports.Watcher = Watcher;
+
+function Watcher(webDirectory) {
+  this.webDirectory = webDirectory;
+
   // array of VogueClient objects
   this.clients = [];
   
@@ -14,7 +21,24 @@ Watcher.prototype.removeClient = function(client) {
   this.clients.splice(this.clients.indexOf(client), 1);
 };
 
+Watcher.prototype.startWatchingByHref = function(href, callback) {
+  // Remove any querystring junk.
+  // e.g. "foo/bar.css?abc=123" --> "foo/bar.css"
+  href = href.split('?')[0];
+  var filename = path.join(this.webDirectory, href);
+  fs.stat(filename, function(err, stats) {
+    if (err) {
+      console.log('Could not read stats for ' + filename);
+      return;
+    }
+
+    this.startWatching(filename);
+    callback(filename, stats);
+  }.bind(this));
+};
+
 Watcher.prototype.startWatching = function(filename) {
+  console.log('Watching file: ' + filename);
   if (filename in this.fileWatcherCount) {
     // already watching this file, so just increment the client count.
     this.fileWatcherCount[filename]++;
@@ -25,10 +49,10 @@ Watcher.prototype.startWatching = function(filename) {
       fileChanged.bind(this)
     );
     this.fileWatcherCount[filename] = 1;
-    console.log('Watching file: ' + filename);
   }
 
   function fileChanged() {
+    console.log('File changed: ' + filename);
     this.clients.forEach(function(client) {
       client.updateFile(filename);
     });
@@ -46,4 +70,3 @@ Watcher.prototype.stopWatching = function(filename) {
   }
 }
 
-exports.Watcher = Watcher;

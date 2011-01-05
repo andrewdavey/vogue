@@ -12,7 +12,7 @@ var http = require('http')
   , fs   = require('fs')
   , path = require('path')
   , opt  = require('parseopt')
-    io   = require('socket.io')
+  , io   = require('socket.io');
 
 var VogueClient = require('./VogueClient').VogueClient
   , Watcher     = require('./Watcher').Watcher;
@@ -20,14 +20,14 @@ var VogueClient = require('./VogueClient').VogueClient
 var options = getOptions()
   , server  = http.createServer(handleHttpRequest)
   , socket  = io.listen(server)
-  , watcher = new Watcher();
+  , watcher = new Watcher(options.webDirectory);
 
 server.listen(options.port);
 socket.on('connection', function(clientSocket) {
   watcher.addClient(new VogueClient(clientSocket, watcher));
 });
 
-console.log('Watching directory: ' + options.dir);
+console.log('Watching directory: ' + options.webDirectory);
 console.log('Listening for clients: http://localhost:' + options.port + '/');
 
 
@@ -65,7 +65,7 @@ function getOptions() {
 
   // The directory to watch is given as the first argument after the options.
   // So we'll put it into the options we return for simplicity.
-  data.options.dir = getDirectoryToWatch(data.arguments);
+  data.options.webDirectory = getDirectoryToWatch(data.arguments);
   return data.options;
 
   function createOptionParser() {
