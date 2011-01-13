@@ -96,10 +96,16 @@ function getOptions() {
   }
 
   function getDirectoryToWatch(arguments) {
-    var dir = path.join(
-      process.cwd(),
-      (arguments.length > 0) ? arguments[0] : ''
-    );
+    var dir;
+    if (arguments.length > 0) {
+      if (/^\//.test(arguments[0])) {
+        dir = arguments[0];
+      } else {
+        dir = path.join(process.cwd(), arguments[0]);
+      }
+    } else {
+      dir = process.cwd();
+    }
 
     try {
       var stats = fs.statSync(dir);
