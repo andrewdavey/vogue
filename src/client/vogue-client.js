@@ -1,20 +1,20 @@
 // Vogue - Client
 // Copyright (c) 2011 Andrew Davey (andrew@equin.co.uk)
-//
-// Note that all occurances of {port} in this script will be replaced with the port of the 
-// HTTP server hosted by Node.
 
 (function() {
 
+var scriptBase = getScriptBase();
+var port = getPort(scriptBase);
+
 loadScripts({
   jQuery: 'http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js',
-  io: 'http://localhost:{port}/socket.io/socket.io.js'
+  io: scriptBase + 'socket.io/socket.io.js'
 }, vogue);
 
 function vogue() {
-  WEB_SOCKET_SWF_LOCATION = 'http://localhost:{port}/socket.io/lib/vendor/web-socket-js/WebSocketMain.swf';
+  WEB_SOCKET_SWF_LOCATION = 'socket.io/lib/vendor/web-socket-js/WebSocketMain.swf';
   var stylesheets = getLocalStylesheets();
-  var socket = new io.Socket('localhost', { port: {port} });
+  var socket = new io.Socket('localhost', { port: port });
   socket.on('connect', watchAllStylesheets);
   socket.on('message', handleMessage);
   socket.connect();
@@ -89,6 +89,20 @@ function loadScript(src, loadedCallback) {
     if (this.readyState == 'complete' || this.readyState == 'loaded') loadedCallback();
   }
   document.getElementsByTagName('head')[0].appendChild(script);
+}
+
+function getScriptBase() {
+  var scripts = document.getElementsByTagName("script");
+  var src = scripts[scripts.length - 1].getAttribute("src");
+  return src.match(/https?\:\/\/.*?\//)[0];
+}
+
+function getPort(url) {
+  // URL may contain the port number after the second colon.
+  // http://domain:1234/
+  var index = url.indexOf(':', 6); // skipping 6 characters to ignore first colon
+  if (index < 0) return 80; // default to port 80 if none found.
+  return parseInt(url.substr(index+1));
 }
 
 })();
