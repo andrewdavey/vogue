@@ -34,7 +34,7 @@ function vogue() {
   }
 
   function reloadStylesheet(href) {
-    var newHref = href 
+    var newHref = '/' + href 
       + (href.indexOf('?') >= 0 ? '&' : '?') 
       + '_vogue_nocache=' 
       + (new Date()).getTime();
