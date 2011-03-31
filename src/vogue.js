@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /* vogue.js
  * A tool for web developers. Vogue watches for changes to CSS files and
  * informs the web browser using them to reload those stylesheets.
