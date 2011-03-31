@@ -3,7 +3,7 @@ var fs   = require('fs')
 
 exports.Watcher = Watcher;
 
-function Watcher(webDirectory) {
+function Watcher(webDirectory, prefix) {
   this.webDirectory = webDirectory;
 
   // array of VogueClient objects
@@ -11,6 +11,9 @@ function Watcher(webDirectory) {
   
   // filename -> number_of_clients_watching 
   this.fileWatcherCount = {};
+
+  // strip the given prefix off of href paths
+  this.prefix = prefix || '';
 }
 
 Watcher.prototype.addClient = function(client) {
@@ -25,6 +28,7 @@ Watcher.prototype.getFilenameForHref = function(href) {
   // Remove any querystring junk.
   // e.g. "foo/bar.css?abc=123" --> "foo/bar.css"
   href = href.split('?')[0];
+  href = href.indexOf(this.prefix) === 0 ? href.slice(this.prefix.length) : href;
   var filename = path.join(this.webDirectory, href);
   return filename;
 };

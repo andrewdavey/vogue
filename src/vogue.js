@@ -22,7 +22,7 @@ var VogueClient = require('./VogueClient').VogueClient
 var options = getOptions()
   , server  = http.createServer(handleHttpRequest)
   , socket  = io.listen(server)
-  , watcher = new Watcher(options.webDirectory);
+  , watcher = new Watcher(options.webDirectory, options.prefix);
 
 server.listen(options.port);
 socket.on('connection', function(clientSocket) {
@@ -91,6 +91,11 @@ function getOptions() {
             // and parser.parse() returns null
             return value;
           }
+        },
+        {
+          name: ['--prefix'],
+          type: 'string',
+          help: 'Strip this prefix from stylesheet href values to get correct filesystem paths'
         }
       ]
     });
