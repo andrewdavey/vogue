@@ -12,6 +12,7 @@
 var http = require('http')
   , fs   = require('fs')
   , path = require('path')
+  , url  = require('url')
   , opt  = require('parseopt')
   , io   = require('socket.io');
 
@@ -33,9 +34,10 @@ console.log('Listening for clients: http://localhost:' + options.port + '/');
 
 
 function handleHttpRequest(request, response) {
-  if (request.url === '/') {
+  var pathname = url.parse(request.url).pathname;
+  if (pathname === '/') {
     sendAboutPage(response);
-  } else if (request.url === '/vogue-client.js') {
+  } else if (pathname === '/vogue-client.js') {
     sendVogueClient(response);
   }
 }
@@ -76,7 +78,7 @@ function getOptions() {
           name: ['--port', '-p'],
           type: 'int',
           help: 'Port to run Vogue server on',
-          default: 8001
+          'default': 8001
         },
         {
           name: ['--help','-h','-?'],

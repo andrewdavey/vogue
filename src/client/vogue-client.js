@@ -3,6 +3,7 @@
 
 (function() {
 
+var stylesheetBases = [document.location.protocol + '//' + document.location.host];
 var scriptBase = getScriptBase();
 var port = getPort(scriptBase);
 
@@ -12,7 +13,7 @@ loadScripts({
 }, vogue);
 
 function vogue() {
-  WEB_SOCKET_SWF_LOCATION = 'socket.io/lib/vendor/web-socket-js/WebSocketMain.swf';
+  window.WEB_SOCKET_SWF_LOCATION = scriptBase + 'socket.io/lib/vendor/web-socket-js/WebSocketMain.swf';
   var stylesheets = getLocalStylesheets();
   var socket = new io.Socket('localhost', { port: port });
   socket.on('connect', watchAllStylesheets);
@@ -34,7 +35,7 @@ function vogue() {
   }
 
   function reloadStylesheet(href) {
-    var newHref = '/' + href 
+    var newHref = stylesheets[href].href
       + (href.indexOf('?') >= 0 ? '&' : '?') 
       + '_vogue_nocache=' 
       + (new Date()).getTime();
@@ -43,22 +44,30 @@ function vogue() {
   
   function getLocalStylesheets() {
     var links = $('link[type=text/css][href]').filter(isLocal);
-    var origin = document.location.protocol + '//' + document.location.host;
-    var skipPrefixLength = origin.length + 1; // The +1 removes the leading '/' character.
     var stylesheets = {};
     links.each(function() {
-      // linkElement.href is resolved by the browser to the full URL.
-      // (unlike reading the actual attribute value.)
-      // Very handy; we can easily get the full path segment of the URL
-      // by skipping the current document's location origin length.
-      var href = this.href.substr(skipPrefixLength);
-      stylesheets[href] = this;
+      // Match hrefs against stylesheet bases we know of
+      for (var i=0; i<stylesheetBases.length; i++) {
+        if (this.href.indexOf(stylesheetBases[i]) > -1) {
+          var href = this.href.substr(stylesheetBases[i].length);
+          stylesheets[href] = this;
+          break;
+        }
+      }
     });
     return stylesheets;
 
     function isLocal() {
       var href = $(this).attr('href');
-      return !href.match(/^https?:/);
+
+      var isExternal = true;
+      for (var i=0; i<stylesheetBases.length; i++) {
+        if (href.indexOf(stylesheetBases[i]) > -1) {
+          isExternal = false;
+          break;
+        }
+      }
+      return !(isExternal && href.match(/^https?:/));
     }
   }
 }
@@ -87,13 +96,18 @@ function loadScript(src, loadedCallback) {
   script.onload = loadedCallback; // Chrome
   script.onreadystatechange = function () { // IE?
     if (this.readyState == 'complete' || this.readyState == 'loaded') loadedCallback();
-  }
+  };
   document.getElementsByTagName('head')[0].appendChild(script);
 }
 
 function getScriptBase() {
   var scripts = document.getElementsByTagName("script");
   var src = scripts[scripts.length - 1].getAttribute("src");
+
+  if (src.match(/base=(.*)$/)) {
+    stylesheetBases.push(src.match(/base=(.*)$/)[1]);
+  }
+
   return src.match(/https?\:\/\/.*?\//)[0];
 }
 
