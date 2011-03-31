@@ -20,6 +20,12 @@
     <script type="text/javascript">
       var favlet = document.getElementById("favlet");
       favlet.href = "javascript:(function(){\
+if (typeof window.__vogue__!=='undefined') return;\
+window.__vogue__ = {\
+url:'http://localhost:{port}/',\
+domain:'localhost',\
+port:{port}\
+};\
 var s = document.createElement('script');\
 s.setAttribute('src', 'http://localhost:{port}/vogue-client.js');\
 s.setAttribute('type', 'text/javascript');\

@@ -3,19 +3,17 @@
 
 (function() {
 
-var stylesheetBases = [document.location.protocol + '//' + document.location.host];
-var scriptBase = getScriptBase();
-var port = getPort(scriptBase);
+var script = getScriptInfo();
 
 loadScripts({
   jQuery: 'http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js',
-  io: scriptBase + 'socket.io/socket.io.js'
+  io: script.url + 'socket.io/socket.io.js'
 }, vogue);
 
 function vogue() {
-  window.WEB_SOCKET_SWF_LOCATION = scriptBase + 'socket.io/lib/vendor/web-socket-js/WebSocketMain.swf';
+  window.WEB_SOCKET_SWF_LOCATION = script.url + 'socket.io/lib/vendor/web-socket-js/WebSocketMain.swf';
   var stylesheets = getLocalStylesheets();
-  var socket = new io.Socket('localhost', { port: port });
+  var socket = new io.Socket(script.domain, { port: script.port });
   socket.on('connect', watchAllStylesheets);
   socket.on('message', handleMessage);
   socket.connect();
@@ -47,9 +45,9 @@ function vogue() {
     var stylesheets = {};
     links.each(function() {
       // Match hrefs against stylesheet bases we know of
-      for (var i=0; i<stylesheetBases.length; i++) {
-        if (this.href.indexOf(stylesheetBases[i]) > -1) {
-          var href = this.href.substr(stylesheetBases[i].length);
+      for (var i=0; i<script.bases.length; i++) {
+        if (this.href.indexOf(script.bases[i]) > -1) {
+          var href = this.href.substr(script.bases[i].length);
           stylesheets[href] = this;
           break;
         }
@@ -61,8 +59,8 @@ function vogue() {
       var href = $(this).attr('href');
 
       var isExternal = true;
-      for (var i=0; i<stylesheetBases.length; i++) {
-        if (href.indexOf(stylesheetBases[i]) > -1) {
+      for (var i=0; i<script.bases.length; i++) {
+        if (href.indexOf(script.bases[i]) > -1) {
           isExternal = false;
           break;
         }
@@ -100,15 +98,31 @@ function loadScript(src, loadedCallback) {
   document.getElementsByTagName('head')[0].appendChild(script);
 }
 
-function getScriptBase() {
-  var scripts = document.getElementsByTagName("script");
-  var src = scripts[scripts.length - 1].getAttribute("src");
+function getScriptInfo() {
+  var bases = [document.location.protocol + '//' + document.location.host];
+  if (typeof window.__vogue__ === "undefined") {
+    var scripts = document.getElementsByTagName("script");
+    var src = scripts[scripts.length - 1].getAttribute("src");
 
-  if (src.match(/base=(.*)$/)) {
-    stylesheetBases.push(src.match(/base=(.*)$/)[1]);
+    var url = src.match(/https?\:\/\/.*?\//)[0];
+
+    var domain = src.match(/https?\:\/(.*?)\//)[1];
+
+    var baseMatch = src.match(/\bbase=(.*)(&|$)/);
+    if (baseMatch) {
+      bases = bases.concat(baseMatch[1].split(','));
+    }
+
+    return {
+      url: url,
+      domain: domain,
+      port: getPort(url),
+      bases: bases
+    };
+  } else {
+    window.__vogue__.bases = bases;
+    return window.__vogue__;
   }
-
-  return src.match(/https?\:\/\/.*?\//)[0];
 }
 
 function getPort(url) {

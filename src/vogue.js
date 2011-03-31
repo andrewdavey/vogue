@@ -55,7 +55,6 @@ function sendAboutPage(response) {
 function sendVogueClient(response) {
   fs.readFile(__dirname + '/client/vogue-client.js', function(e, fileData) {
     var script = fileData.toString();
-    script = script.replace(/\{port\}/g, options.port.toString());
     response.writeHead(200, { 'Content-Type': 'text/javascript' });
     response.write(script);
     response.end();
