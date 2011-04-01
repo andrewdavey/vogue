@@ -41,7 +41,7 @@ function vogue() {
   }
   
   function getLocalStylesheets() {
-    var links = $('link[type="text/css"][href]').filter(isLocal);
+    var links = $('link[rel="stylesheet"][href]').filter(isLocal);
     var stylesheets = {};
     links.each(function() {
       // Match hrefs against stylesheet bases we know of
