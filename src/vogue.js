@@ -82,7 +82,7 @@ function getOptions() {
         {
           name: ['--rewrite', '-r'],
           type: 'string',
-          help: 'foo:bar replaces foo in url with bar when looking for the file',
+          help: 'Expression of the form "regexp:replacement" rewrites a URL path into a file system path, relative to the website root directory. For example: --rewrite "v[0-9]/(.*)$:files/\\$1" would change "v1/demo.css" to "files/demo.css".',
           'default': null
         },
         {

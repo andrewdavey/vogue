@@ -3,14 +3,30 @@ var fs   = require('fs')
 
 exports.Watcher = Watcher;
 
-function Watcher(webDirectory,rewrite) {
+function Watcher(webDirectory, rewrite) {
   this.webDirectory = webDirectory;
-  this.rewrite = rewrite;
   // array of VogueClient objects
   this.clients = [];
   
   // filename -> number_of_clients_watching 
   this.fileWatcherCount = {};
+
+  if (rewrite) {
+    this.rewriteUrlToPath = createRewriter(rewrite); 
+  }
+
+  function createRewriter(rewrite) {
+    var parts = rewrite.split(':');
+    if (parts.length === 2) {
+      var regex = new RegExp(parts[0]);
+      var replacement = parts[1];
+      return function (str) { 
+        return str.replace(regex, replacement);
+      }
+    } else {
+      throw new Error('Rewrite must be of the form "regex:replacement".');
+    }
+  }
 }
 
 Watcher.prototype.addClient = function(client) {
@@ -22,11 +38,8 @@ Watcher.prototype.removeClient = function(client) {
 };
 
 Watcher.prototype.getFilenameForHref = function(href) {
-  if(this.rewrite && typeof rewrite =="string") {
-      var parts = this.rewrite.split(':');
-      if(parts.length == 2) {
-	  href = href.replace(parts[0],parts[1]);
-      }
+  if (this.rewriteUrlToPath) {
+    href = this.rewriteUrlToPath(href);
   }
   // Remove any querystring junk.
   // e.g. "foo/bar.css?abc=123" --> "foo/bar.css"
