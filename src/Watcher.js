@@ -3,9 +3,9 @@ var fs   = require('fs')
 
 exports.Watcher = Watcher;
 
-function Watcher(webDirectory) {
+function Watcher(webDirectory,rewrite) {
   this.webDirectory = webDirectory;
-
+  this.rewrite = rewrite;
   // array of VogueClient objects
   this.clients = [];
   
@@ -22,6 +22,12 @@ Watcher.prototype.removeClient = function(client) {
 };
 
 Watcher.prototype.getFilenameForHref = function(href) {
+  if(this.rewrite && typeof rewrite =="string") {
+      var parts = this.rewrite.split(':');
+      if(parts.length == 2) {
+	  href = href.replace(parts[0],parts[1]);
+      }
+  }
   // Remove any querystring junk.
   // e.g. "foo/bar.css?abc=123" --> "foo/bar.css"
   href = href.split('?')[0];

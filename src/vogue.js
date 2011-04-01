@@ -22,7 +22,7 @@ var VogueClient = require('./VogueClient').VogueClient
 var options = getOptions()
   , server  = http.createServer(handleHttpRequest)
   , socket  = io.listen(server)
-  , watcher = new Watcher(options.webDirectory);
+  , watcher = new Watcher(options.webDirectory,options.rewrite);
 
 server.listen(options.port);
 socket.on('connection', function(clientSocket) {
@@ -78,6 +78,12 @@ function getOptions() {
           type: 'int',
           help: 'Port to run Vogue server on',
           'default': 8001
+        },
+        {
+          name: ['--rewrite', '-r'],
+          type: 'string',
+          help: 'foo:bar replaces foo in url with bar when looking for the file',
+          'default': null
         },
         {
           name: ['--help','-h','-?'],

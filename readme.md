@@ -23,7 +23,7 @@ Run the Vogue server.
     vogue --port 8001 /path/to/website
 
 --port : The port used for Vogue's HTTP server. Optional, defaults to 8001.
-
+--rewrite : A rule in the form of token:replace-ment-token to help rewrite urls to filesystem paths
 Open http://localhost:8001/ to see instructions for loading the Vogue client into your
 web pages.
 
