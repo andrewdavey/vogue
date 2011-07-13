@@ -1,21 +1,25 @@
 {
-  "name": "vogue",
+  "name": "vogue-dtrejo",
   "description": "Auto-reload stylesheets in web browser whenever the CSS files are saved.",
-  "version": "0.2.0",
-  "homepage": "http://github.com/andrewdavey/vogue",
-  "repository": "http://github.com/andrewdavey/vogue.git",
-  "author": "Andrew Davey <andrew@equin.co.uk> (http://aboutcode.net/)",
+  "version": "0.2.1",
+  "homepage": "https://github.com/dtrejo/vogue",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:DTrejo/vogue.git"
+  },
+  "author": "Andrew Davey <andrew@equin.co.uk> (http://aboutcode.net/), David Trejo <dtrejo@cs.brown.edu> (http://dtrejo.com/)",
   "directories": {
     "lib": ""
   },
   "engines": {
-    "node": "*"
+    "node": "0.4.x"
   },
   "bin": {
     "vogue": "./vogue.js"
   },
   "dependencies": {
-    "socket.io": ">=0.6.3",
+    "socket.io": "0.6.17",
     "parseopt": ">=1.0.0"
-  }
+  },
+  "devDependencies": {}
 }

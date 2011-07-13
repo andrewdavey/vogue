@@ -23,7 +23,8 @@ VogueClient.prototype.watchFile = function(href) {
   var filename = this.watcher.getFilenameForHref(href);
   fs.stat(filename, function(err, stats) {
     if (err) {
-      console.log('Could not read stats for ' + filename);
+      console.log('Could not read stats for ' + filename, 'because'
+        , err.message);
       return;
     }
     
@@ -40,6 +41,7 @@ VogueClient.prototype.updateFile = function(filename) {
   if (fileInfo) {
     fs.stat(filename, function(err, stats) {
       if (err) {
+        console.error(err);
         console.error('Could not read stats for file: ' + filename);
         return;
       }
