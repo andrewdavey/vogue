@@ -31,11 +31,11 @@ function vogue() {
       + (href.indexOf('?') >= 0 ? '&' : '?') 
       + '_vogue_nocache=' 
       + (new Date()).getTime();
-    $(stylesheets[href]).attr('href', newHref);
+    jQuery(stylesheets[href]).attr('href', newHref);
   }
   
   function getLocalStylesheets() {
-    var links = $('link[rel="stylesheet"][href]').filter(isLocal);
+    var links = jQuery('link[rel="stylesheet"][href]').filter(isLocal);
     var stylesheets = {};
     links.each(function() {
       // Match hrefs against stylesheet bases we know of
@@ -50,7 +50,7 @@ function vogue() {
     return stylesheets;
 
     function isLocal() {
-      var href = $(this).attr('href');
+      var href = jQuery(this).attr('href');
 
       var isExternal = true;
       for (var i=0; i<script.bases.length; i++) {
