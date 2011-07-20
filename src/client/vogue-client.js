@@ -13,23 +13,18 @@ loadScripts({
 function vogue() {
   window.WEB_SOCKET_SWF_LOCATION = script.url + 'socket.io/lib/vendor/web-socket-js/WebSocketMain.swf';
   var stylesheets = getLocalStylesheets();
-  var socket = new io.Socket(script.domain, { port: script.port });
+  var socket = io.connect("http://" + script.domain + ":" + script.port);
   socket.on('connect', watchAllStylesheets);
-  socket.on('message', handleMessage);
-  socket.connect();
+  socket.on('update', handleMessage);
 
   function watchAllStylesheets() {
     for (var href in stylesheets) {
-      socket.send('watch ' + href);
+      socket.emit('watch', { href: href });
     }
   }
 
   function handleMessage(message) {
-    var match = message.match(/^update (.*)$/);
-    if (match) {
-      var href = match[1];
-      reloadStylesheet(href);
-    }
+    reloadStylesheet(message.href);
   }
 
   function reloadStylesheet(href) {

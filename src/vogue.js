@@ -25,7 +25,7 @@ var options = getOptions()
   , watcher = new Watcher(options.webDirectory,options.rewrite);
 
 server.listen(options.port);
-socket.on('connection', function(clientSocket) {
+socket.sockets.on('connection', function(clientSocket) {
   watcher.addClient(new VogueClient(clientSocket, watcher));
 });
 

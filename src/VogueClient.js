@@ -7,16 +7,13 @@ function VogueClient(clientSocket, watcher) {
   this.socket = clientSocket;
   this.watcher = watcher;
   this.watchedFiles = {};
-  clientSocket.on('message', this.handleMessage.bind(this));
+  clientSocket.on('watch', this.handleMessage.bind(this));
   clientSocket.on('disconnect', this.disconnect.bind(this));
 }
 
 // Parse an incoming message from the client and dispatch accordingly.
-VogueClient.prototype.handleMessage = function(message) {
-  var match = message.match(/^watch (.*)$/);
-  if (!match) return;
-  var href = match[1];
-  this.watchFile(href);
+VogueClient.prototype.handleMessage = function(data) {
+  this.watchFile(data.href);
 };
 
 VogueClient.prototype.watchFile = function(href) {
@@ -46,7 +43,7 @@ VogueClient.prototype.updateFile = function(filename) {
       // Only send message to client if the file was modified
       // since we last saw it.
       if (fileInfo.mtime < stats.mtime) {
-        this.socket.send('update ' + fileInfo.href);
+        this.socket.emit('update', { href: fileInfo.href });
         fileInfo.mtime = stats.mtime;
       }
     }.bind(this));
