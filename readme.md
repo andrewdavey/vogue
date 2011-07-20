@@ -15,16 +15,18 @@ The client javascript can be loaded into a HTML page using a single script tag.
 Make sure you have Node.JS and [npm](http://npmjs.org/) installed.  
 Then run: 
 
-    npm install vogue
+    npm install vogue -g
 
 ## Usage
 Run the Vogue server.
 
     vogue --port 8001 /path/to/website
 
---port : The port used for Vogue's HTTP server. Optional, defaults to 8001.
---rewrite : A rule in the form of "regexp:replacement" (e.g. "v[0-9]/(.*)$:files/\$1" ) to help rewrite urls to filesystem paths. 
-Submatches such as $1 will probably need to entered in your shell as \$1 to escape the $. 
+`--port` : The port used for Vogue's HTTP server. Optional, defaults to 8001.
+
+`--rewrite` : A rule in the form of "regexp:replacement" (e.g. "v[0-9]/(.*)$:files/\$1" ) to rewrite urls to filesystem paths.
+ Submatches such as $1 will probably need to entered in your shell as \$1 to escape the $. 
+
 Open http://localhost:8001/ to see instructions for loading the Vogue client into your
 web pages.
 
