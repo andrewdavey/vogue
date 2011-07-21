@@ -104,9 +104,9 @@ function getScriptInfo() {
     var scripts = document.getElementsByTagName("script");
     var src = scripts[scripts.length - 1].getAttribute("src");
 
-    var url = src.match(/https?\:\/\/.*?\//)[0];
-
-    var domain = src.match(/https?\:\/(.*?)\//)[1];
+    var rootMatch = src.match(/https?\:\/\/(.*?)\//);
+    var url = rootMatch[0];
+    var domain = rootMatch[1];
 
     var baseMatch = src.match(/\bbase=(.*)(&|$)/);
     if (baseMatch) {
