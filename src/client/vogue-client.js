@@ -130,7 +130,7 @@ function getPort(url) {
   // http://domain:1234/
   var index = url.indexOf(':', 6); // skipping 6 characters to ignore first colon
   if (index < 0) return 80; // default to port 80 if none found.
-  return parseInt(url.substr(index+1));
+  return parseInt(url.substr(index+1), 10);
 }
 
 })();
