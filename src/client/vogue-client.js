@@ -6,7 +6,6 @@
 var script = getScriptInfo();
 
 loadScripts({
-  jQuery: 'http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js',
   io: script.url + 'socket.io/socket.io.js'
 }, vogue);
 
@@ -31,27 +30,16 @@ function vogue() {
       + (href.indexOf('?') >= 0 ? '&' : '?') 
       + '_vogue_nocache=' 
       + (new Date()).getTime();
-    jQuery(stylesheets[href]).attr('href', newHref);
+      stylesheets[href].href = newHref;
   }
   
   function getLocalStylesheets() {
-    var links = jQuery('link[rel="stylesheet"][href]').filter(isLocal);
-    var stylesheets = {};
-    links.each(function() {
-      // Match hrefs against stylesheet bases we know of
-      for (var i=0; i<script.bases.length; i++) {
-        if (this.href.indexOf(script.bases[i]) > -1) {
-          var href = this.href.substr(script.bases[i].length);
-          stylesheets[href] = this;
-          break;
-        }
+    
+    function isLocalStylesheet(link) {
+      if (link.getAttribute('rel') !== 'stylesheet') {
+        return false;
       }
-    });
-    return stylesheets;
-
-    function isLocal() {
-      var href = jQuery(this).attr('href');
-
+      var href = link.href;
       var isExternal = true;
       for (var i=0; i<script.bases.length; i++) {
         if (href.indexOf(script.bases[i]) > -1) {
@@ -61,6 +49,24 @@ function vogue() {
       }
       return !(isExternal && href.match(/^https?:/));
     }
+    
+    var links = document.getElementsByTagName('link');
+    var stylesheets = {};
+    for (var i = 0, m = links.length; i < m; i++) {
+      if (!isLocalStylesheet(links[i])) {
+        continue;
+      }
+      // Match hrefs against stylesheet bases we know of
+      for (var j=0; j<script.bases.length; j++) {
+        if (links[i].href.indexOf(script.bases[j]) > -1) {
+          var href = links[i].href.substr(script.bases[j].length);
+          stylesheets[href] = links[i];
+          break;
+        }
+      }      
+    }
+
+    return stylesheets;
   }
 }
 
