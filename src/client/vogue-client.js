@@ -6,12 +6,12 @@
 var script = getScriptInfo();
 
 loadScripts({
-  io: script.url + 'socket.io/socket.io.js'
+  io: script.rootUrl + 'socket.io/socket.io.js'
 }, vogue);
 
 function vogue() {
   var stylesheets = getLocalStylesheets();
-  var socket = io.connect("http://" + script.domain + ":" + script.port);
+  var socket = io.connect(script.rootUrl);
   socket.on('connect', watchAllStylesheets);
   socket.on('update', handleMessage);
 
@@ -104,9 +104,7 @@ function getScriptInfo() {
     var scripts = document.getElementsByTagName("script");
     var src = scripts[scripts.length - 1].getAttribute("src");
 
-    var rootMatch = src.match(/https?\:\/\/(.*?)\//);
-    var url = rootMatch[0];
-    var domain = rootMatch[1];
+    var rootUrl = src.match(/^https?\:\/\/(.*?)\//)[0];
 
     var baseMatch = src.match(/\bbase=(.*)(&|$)/);
     if (baseMatch) {
@@ -114,9 +112,7 @@ function getScriptInfo() {
     }
 
     return {
-      url: url,
-      domain: domain,
-      port: getPort(url),
+      rootUrl: rootUrl,
       bases: bases
     };
   } else {
