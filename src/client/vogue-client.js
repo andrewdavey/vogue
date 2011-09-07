@@ -119,11 +119,13 @@
       // Go through all the links in the page, looking for stylesheets.
       for (i = 0, m = links.length; i < m; i += 1) {
         link = links[i];
-        if (isLocalStylesheet(link)) {
-          // Link is local, get the base URL.
-          href = getBase(link.href);
-          if (href !== false) {
-            stylesheets[href] = link;
+        if (link.getAttribute("media") != "print") {
+          if (isLocalStylesheet(link)) {
+            // Link is local, get the base URL.
+            href = getBase(link.href);
+            if (href !== false) {
+              stylesheets[href] = link;
+            }
           }
         }
       }
@@ -131,18 +133,20 @@
       // Go through all the style tags, looking for @import tags.
       links = document.getElementsByTagName("style");
       for (i = 0, m = links.length; i < m; i += 1) {
-        content = links[i].text || links[i].textContent;
-        while ((matches = reImport.exec(content))) {
-          link = {
-            rel: "stylesheet",
-            href: matches[1],
-            getAttribute: getProperty
-          };
-          if (isLocalStylesheet(link)) {
-            // Link is local, get the base URL.
-            href = getBase(link.href);
-            if (href !== false) {
-              stylesheets[href] = link;
+        if (links[i].getAttribute("media") != "print") {
+          content = links[i].text || links[i].textContent;
+          while ((matches = reImport.exec(content))) {
+            link = {
+              rel: "stylesheet",
+              href: matches[1],
+              getAttribute: getProperty
+            };
+            if (isLocalStylesheet(link)) {
+              // Link is local, get the base URL.
+              href = getBase(link.href);
+              if (href !== false) {
+                stylesheets[href] = link;
+              }
             }
           }
         }
