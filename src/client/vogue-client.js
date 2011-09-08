@@ -141,7 +141,7 @@
       // Go through all the style tags, looking for @import tags.
       links = document.getElementsByTagName("style");
       for (i = 0, m = links.length; i < m; i += 1) {
-        if (isPrintStylesheet(link[i])) continue;
+        if (isPrintStylesheet(links[i])) continue;
         content = links[i].text || links[i].textContent;
         while ((matches = reImport.exec(content))) {
           link = {
