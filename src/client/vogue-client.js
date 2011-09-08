@@ -91,6 +91,16 @@
       }
 
       /**
+       * Checks if the stylesheet's media attribute is 'print'
+       *
+       * @param (Object) link The stylesheet element to check.
+       * @returns (Boolean)
+       */
+      function isPrintStylesheet(link) {
+        return link.getAttribute("media") === "print";
+      }
+
+      /**
        * Get the link's base URL.
        *
        * @param {String} href The URL to check.
@@ -119,34 +129,31 @@
       // Go through all the links in the page, looking for stylesheets.
       for (i = 0, m = links.length; i < m; i += 1) {
         link = links[i];
-        if (link.getAttribute("media") != "print") {
-          if (isLocalStylesheet(link)) {
-            // Link is local, get the base URL.
-            href = getBase(link.href);
-            if (href !== false) {
-              stylesheets[href] = link;
-            }
-          }
+        if (isPrintStylesheet(link)) continue;
+        if (!isLocalStylesheet(link)) continue;
+        // Link is local, get the base URL.
+        href = getBase(link.href);
+        if (href !== false) {
+          stylesheets[href] = link;
         }
       }
 
       // Go through all the style tags, looking for @import tags.
       links = document.getElementsByTagName("style");
       for (i = 0, m = links.length; i < m; i += 1) {
-        if (links[i].getAttribute("media") != "print") {
-          content = links[i].text || links[i].textContent;
-          while ((matches = reImport.exec(content))) {
-            link = {
-              rel: "stylesheet",
-              href: matches[1],
-              getAttribute: getProperty
-            };
-            if (isLocalStylesheet(link)) {
-              // Link is local, get the base URL.
-              href = getBase(link.href);
-              if (href !== false) {
-                stylesheets[href] = link;
-              }
+        if (isPrintStylesheet(link[i])) continue;
+        content = links[i].text || links[i].textContent;
+        while ((matches = reImport.exec(content))) {
+          link = {
+            rel: "stylesheet",
+            href: matches[1],
+            getAttribute: getProperty
+          };
+          if (isLocalStylesheet(link)) {
+            // Link is local, get the base URL.
+            href = getBase(link.href);
+            if (href !== false) {
+              stylesheets[href] = link;
             }
           }
         }
