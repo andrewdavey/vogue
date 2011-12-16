@@ -9,6 +9,8 @@
     var stylesheets,
         socket = io.connect(script.rootUrl);
 
+    var imported = {};
+
     /**
      * Watch for all available stylesheets.
      */
@@ -29,12 +31,20 @@
      * @param {String} href The URL of the stylesheet to be reloaded.
      */
     function reloadStylesheet(href) {
-      var newHref = stylesheets[href].href +
+      var newHref = href +
             (href.indexOf("?") >= 0 ? "&" : "?") +
             "_vogue_nocache=" + (new Date).getTime(),
           stylesheet;
+        
       // Check if the appropriate DOM Node is there.
       if (!stylesheets[href].setAttribute) {
+        // If the stylesheet is from an @import, remove it
+        // as a "rule" and add it as a normal stylesheet
+        if (imported[href]) {
+          imported[href].styleSheet.deleteRule(imported[href].index);
+          delete imported[href];
+        }
+        
         // Create the link.
         stylesheet = document.createElement("link");
         stylesheet.setAttribute("rel", "stylesheet");
@@ -158,6 +168,21 @@
           }
         }
       }
+      // Go through stylesheet rules
+      var allStyleSheets = document.styleSheets;
+      function recLoop(styleSheet) {
+        for ( var i = 0, rule; rule = styleSheet.rules[i]; i++ ) {
+          if ( rule.constructor == CSSImportRule ) {
+            var h = rule.href;
+            stylesheets[h] = {rel: "stylesheet", href: h};
+            imported[h] = {styleSheet: styleSheet, index: i};
+            recursivelyAddImportedStylesheets(rule.styleSheet);
+          }
+        }
+      }
+      for ( var i = 0, sheet; sheet = allStyleSheets[i]; i++)
+        recursivelyAddImportedStylesheets(sheet);
+      
       return stylesheets;
     }
 
