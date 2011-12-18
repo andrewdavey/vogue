@@ -228,8 +228,10 @@
         scripts, src, rootUrl, baseMatch;
     if (typeof window.__vogue__ === "undefined") {
       scripts = document.getElementsByTagName("script");
-      // The last parsed script will be our script.
-      src = scripts[scripts.length - 1].getAttribute("src");
+      for (var i=0; i < scripts.length; i++) {
+        src = scripts[i].getAttribute("src");
+        if (src.slice(-15) == 'vogue-client.js') break;
+      }
       rootUrl = src.match(/^https?\:\/\/(.*?)\//)[0];
       // There is an optional base argument, that can be used.
       baseMatch = src.match(/\bbase=(.*)(&|$)/);
