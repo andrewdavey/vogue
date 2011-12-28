@@ -41,7 +41,13 @@
         // If the stylesheet is from an @import, remove it
         // as a "rule" and add it as a normal stylesheet
         if (imported[href]) {
-          imported[href].styleSheet.deleteRule(imported[href].index);
+          var styleSheet = imported[href].styleSheet;
+          var index = imported[href].index;
+          // deleteRule is standard way of removing rules, removeRule is for IE
+          if (styleSheet.deleteRule)
+            styleSheet.deleteRule(index);
+          else if (styleSheet.removeRule)
+            styleSheet.removeRule(index);
           delete imported[href];
         }
         
