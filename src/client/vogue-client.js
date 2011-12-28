@@ -35,7 +35,7 @@
             (href.indexOf("?") >= 0 ? "&" : "?") +
             "_vogue_nocache=" + (new Date).getTime(),
           stylesheet;
-        
+      
       // Check if the appropriate DOM Node is there.
       if (!stylesheets[href].setAttribute) {
         // If the stylesheet is from an @import, remove it
@@ -150,9 +150,15 @@
       // Go through stylesheet rules looking for @import
       var allStyleSheets = document.styleSheets;
       function recursivelyAddImportedStylesheets(styleSheet) {
-        if ( ! styleSheet.rules ) return;
-        for ( var i = 0, rule; rule = styleSheet.rules[i]; i++ ) {
-          if ( rule.constructor == CSSImportRule ) {
+        var rules;
+        // The try {} will catch security errors when trying to get cssRules
+        // from cross domain stylesheets
+        try {
+          rules = styleSheet.rules || styleSheet.cssRules;
+        } catch (e) {}
+        if ( ! rules ) return;
+        for ( var i = 0, rule; rule = rules[i]; i++ ) {
+          if ( rule.href ) {
             var h = rule.href;
             stylesheets[h] = {rel: "stylesheet", href: h};
             imported[h] = {styleSheet: styleSheet, index: i};
