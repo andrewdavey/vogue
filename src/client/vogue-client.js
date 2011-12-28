@@ -132,7 +132,6 @@
       }
 
       var stylesheets = {},
-          reImport = /@import\s+url\(["']?([^"'\)]+)["']?\)/g,
           links = document.getElementsByTagName("link"),
           link, href, matches, content, i, m;
 
@@ -148,29 +147,10 @@
         }
       }
 
-      // Go through all the style tags, looking for @import tags.
-      links = document.getElementsByTagName("style");
-      for (i = 0, m = links.length; i < m; i += 1) {
-        if (isPrintStylesheet(links[i])) continue;
-        content = links[i].text || links[i].textContent;
-        while ((matches = reImport.exec(content))) {
-          link = {
-            rel: "stylesheet",
-            href: matches[1],
-            getAttribute: getProperty
-          };
-          if (isLocalStylesheet(link)) {
-            // Link is local, get the base URL.
-            href = getBase(link.href);
-            if (href !== false) {
-              stylesheets[href] = link;
-            }
-          }
-        }
-      }
-      // Go through stylesheet rules
+      // Go through stylesheet rules looking for @import
       var allStyleSheets = document.styleSheets;
-      function recLoop(styleSheet) {
+      function recursivelyAddImportedStylesheets(styleSheet) {
+        if ( ! styleSheet.rules ) return;
         for ( var i = 0, rule; rule = styleSheet.rules[i]; i++ ) {
           if ( rule.constructor == CSSImportRule ) {
             var h = rule.href;
@@ -255,7 +235,7 @@
       scripts = document.getElementsByTagName("script");
       for (var i=0; i < scripts.length; i++) {
         src = scripts[i].getAttribute("src");
-        if (src.slice(-15) === 'vogue-client.js') break;
+        if (src && src.slice(-15) === 'vogue-client.js') break;
       }
       rootUrl = src.match(/^https?\:\/\/(.*?)\//)[0];
       // There is an optional base argument, that can be used.
