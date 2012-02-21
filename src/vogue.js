@@ -16,22 +16,54 @@ var http = require('http')
   , opt  = require('parseopt')
   , io   = require('socket.io');
 
-var VogueClient = require('./VogueClient').VogueClient
-  , Watcher     = require('./Watcher').Watcher;
+// var VogueClient = require('./VogueClient').VogueClient
+  // , Watcher     = require('./Watcher').Watcher;
 
 var options = getOptions()
   , server  = http.createServer(handleHttpRequest)
   , socket  = io.listen(server)
-  , watcher = new Watcher(options.webDirectory,options.rewrite);
+  // , watcher = new Watcher(options.webDirectory,options.rewrite);
 
 server.listen(options.port);
-socket.sockets.on('connection', function(clientSocket) {
-  watcher.addClient(new VogueClient(clientSocket, watcher));
-});
 
 console.log('Watching directory: ' + options.webDirectory);
 console.log('Listening for clients: http://localhost:' + options.port + '/');
 
+var walk = function(dir, done) {
+  var results = [];
+  fs.readdir(dir, function(err, list) {
+    if (err) return done(err);
+    var i = 0;
+    (function next() {
+      var file = list[i++];
+      if (!file) return done(null, results);
+      file = dir + '/' + file;
+      fs.stat(file, function(err, stat) {
+        if (stat && stat.isDirectory()) {
+          walk(file, function(err, res) {
+            results = results.concat(res);
+            next();
+          });
+        } else {
+          results.push(file);
+          next();
+        }
+      });
+    })();
+  });
+};
+
+// watch every file in the whole directory we're put to
+walk(options.webDirectory, function(err, list) {
+	list.forEach(function(file) {
+		fs.watchFile(file, {interval: 300}, function(cur, prev) {
+			if (cur.mtime.toString() != prev.mtime.toString()) {
+				socket.sockets.emit('update');
+			}
+		});
+	})
+	console.log('Now watching '+list.length+' files');
+})
 
 function handleHttpRequest(request, response) {
   var pathname = url.parse(request.url).pathname;

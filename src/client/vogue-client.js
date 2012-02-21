@@ -9,56 +9,13 @@
     var stylesheets,
         socket = io.connect(script.rootUrl);
 
-    /**
-     * Watch for all available stylesheets.
-     */
-    function watchAllStylesheets() {
-      var href;
+	function updateAllStylesheets() {
       for (href in stylesheets) {
         if (hop.call(stylesheets, href)) {
-          socket.emit("watch", {
-            href: href
-          });
+			stylesheets[href].href += (stylesheets[href].href.indexOf('?') === -1 ? "?" : "&")+"_vogue_rand="+Math.random();
         }
       }
-    }
-
-    /**
-     * Reload a stylesheet.
-     *
-     * @param {String} href The URL of the stylesheet to be reloaded.
-     */
-    function reloadStylesheet(href) {
-      var newHref = stylesheets[href].href +
-            (href.indexOf("?") >= 0 ? "&" : "?") +
-            "_vogue_nocache=" + (new Date).getTime(),
-          stylesheet;
-      // Check if the appropriate DOM Node is there.
-      if (!stylesheets[href].setAttribute) {
-        // Create the link.
-        stylesheet = document.createElement("link");
-        stylesheet.setAttribute("rel", "stylesheet");
-        stylesheet.setAttribute("href", newHref);
-        head.appendChild(stylesheet);
-
-        // Update the reference to the newly created link.
-        stylesheets[href] = stylesheet;
-      } else {
-        // Update the href to the new URL.
-        stylesheets[href].href = newHref;
-      }
-    }
-
-
-    /**
-     * Handle messages from socket.io, and load the appropriate stylesheet.
-     *
-     * @param message Socket.io message object.
-     * @param message.href The url of the stylesheet to be loaded.
-     */
-    function handleMessage(message) {
-      reloadStylesheet(message.href);
-    }
+	}
 
     /**
      * Fetch all the local stylesheets from the page.
@@ -162,8 +119,7 @@
     }
 
     stylesheets = getLocalStylesheets();
-    socket.on("connect", watchAllStylesheets);
-    socket.on("update", handleMessage);
+    socket.on("update", updateAllStylesheets);
   }
 
   /**
