@@ -12,7 +12,24 @@
 	function updateAllStylesheets() {
       for (href in stylesheets) {
         if (hop.call(stylesheets, href)) {
-			stylesheets[href].href += (stylesheets[href].href.indexOf('?') === -1 ? "?" : "&")+"_vogue_rand="+Math.random();
+			// use ajax to download contents of CSS
+			// and create a <style> tag with it. This prevents a flash of unstyled content
+			var new_url = stylesheets[href].href+(stylesheets[href].href.indexOf('?') === -1 ? "?" : "&")+"_vogue_rand="+Math.random();
+			var ajax = new XMLHttpRequest();
+			ajax.base_href = href;
+			ajax.onreadystatechange = function(){
+				if (this.readyState == 4){
+					var div = document.createElement('div');
+					div.innerHTML = "<style>"+this.responseText+"</style>";
+					stylesheets[this.base_href].parentNode.removeChild(stylesheets[this.base_href]);
+					stylesheets[this.base_href] = div;
+					// make it look like a <link> tag
+					div.href = this.base_href;
+					document.body.appendChild(div);
+				}
+			}
+			ajax.open("GET", new_url, true);
+			ajax.send(null);
         }
       }
 	}
