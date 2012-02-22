@@ -19,13 +19,21 @@
 			ajax.base_href = href;
 			ajax.onreadystatechange = function(){
 				if (this.readyState == 4){
-					var div = document.createElement('div');
-					div.innerHTML = "<style>"+this.responseText+"</style>";
 					stylesheets[this.base_href].parentNode.removeChild(stylesheets[this.base_href]);
-					stylesheets[this.base_href] = div;
+					
+					// http://www.phpied.com/dynamic-script-and-style-elements-in-ie/
+					var sheet = document.createElement('style');
+					
+					sheet.setAttribute("type", "text/css");
+					document.getElementsByTagName('head')[0].appendChild(sheet);
+					if (sheet.styleSheet) {   // IE
+					    sheet.styleSheet.cssText = this.responseText;
+					} else { // the world
+					    sheet.appendChild(document.createTextNode(this.responseText));
+					}
+					stylesheets[this.base_href] = sheet;
 					// make it look like a <link> tag
-					div.href = this.base_href;
-					document.body.appendChild(div);
+					sheet.href = this.base_href;
 				}
 			}
 			ajax.open("GET", new_url, true);
