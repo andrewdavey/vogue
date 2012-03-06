@@ -74,16 +74,6 @@ function handleHttpRequest(request, response) {
   }
 }
 
-function sendAboutPage(response) {
-  fs.readFile(__dirname + '/client/about.htm', function(e, fileData) {
-    var html = fileData.toString();
-    html = html.replace(/\{port\}/g, options.port.toString());
-    response.writeHead(200, { 'Content-Type': 'text/html' });
-    response.write(html);
-    response.end();
-  });
-}
-
 function sendVogueClient(response) {
   fs.readFile(__dirname + '/client/vogue-client.js', function(e, fileData) {
     var script = fileData.toString();
