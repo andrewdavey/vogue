@@ -10,36 +10,36 @@
         socket = io.connect(script.rootUrl);
 
 	function updateAllStylesheets() {
-      for (href in stylesheets) {
-        if (hop.call(stylesheets, href)) {
-			// use ajax to download contents of CSS
-			// and create a <style> tag with it. This prevents a flash of unstyled content
-			var new_url = stylesheets[href].href+(stylesheets[href].href.indexOf('?') === -1 ? "?" : "&")+"_vogue_rand="+Math.random();
-			var ajax = new XMLHttpRequest();
-			ajax.base_href = href;
-			ajax.onreadystatechange = function(){
-				if (this.readyState == 4){
-					stylesheets[this.base_href].parentNode.removeChild(stylesheets[this.base_href]);
-					
-					// http://www.phpied.com/dynamic-script-and-style-elements-in-ie/
-					var sheet = document.createElement('style');
-					
-					sheet.setAttribute("type", "text/css");
-					document.getElementsByTagName('head')[0].appendChild(sheet);
-					if (sheet.styleSheet) {   // IE
-					    sheet.styleSheet.cssText = this.responseText;
-					} else { // the world
-					    sheet.appendChild(document.createTextNode(this.responseText));
-					}
-					stylesheets[this.base_href] = sheet;
-					// make it look like a <link> tag
-					sheet.href = this.base_href;
-				}
-			}
-			ajax.open("GET", new_url, true);
-			ajax.send(null);
+    for (href in stylesheets) {
+      if (hop.call(stylesheets, href)) {
+        // use ajax to download contents of CSS
+        // and create a <style> tag with it. This prevents a flash of unstyled content
+        var new_url = stylesheets[href].href+(stylesheets[href].href.indexOf('?') === -1 ? "?" : "&")+"_vogue_rand="+Math.random();
+        var ajax = new XMLHttpRequest();
+        ajax.base_href = href;
+        ajax.onreadystatechange = function(){
+          if (this.readyState == 4){
+            stylesheets[this.base_href].parentNode.removeChild(stylesheets[this.base_href]);
+            
+            // http://www.phpied.com/dynamic-script-and-style-elements-in-ie/
+            var sheet = document.createElement('style');
+            
+            sheet.setAttribute("type", "text/css");
+            document.getElementsByTagName('head')[0].appendChild(sheet);
+            if (sheet.styleSheet) {   // IE
+                sheet.styleSheet.cssText = this.responseText;
+            } else { // the world
+                sheet.appendChild(document.createTextNode(this.responseText));
+            }
+            stylesheets[this.base_href] = sheet;
+            // make it look like a <link> tag
+            sheet.href = this.base_href;
+          }
         }
+        ajax.open("GET", new_url, true);
+        ajax.send(null);
       }
+    }
 	}
 
     /**
@@ -69,7 +69,7 @@
           }
         }
 
-        return !(isExternal && href.match(/^https?:/));
+        return !isExternal;
       }
 
       /**
@@ -213,7 +213,7 @@
         src = scripts[i].getAttribute("src");
         if (src && src.slice(-15) === 'vogue-client.js') break;
       }
-      rootUrl = src.match(/^https?\:\/\/(.*?)\//)[0];
+      rootUrl = src.match(/^(?:https?\:)?\/\/(.*?)\//)[0];
       // There is an optional base argument, that can be used.
       baseMatch = src.match(/\bbase=(.*)(&|$)/);
 
