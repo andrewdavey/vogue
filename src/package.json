@@ -1,10 +1,13 @@
 {
   "name": "vogue",
   "description": "Auto-reload stylesheets in web browser whenever the CSS files are saved.",
-  "version": "0.4.3",
-  "homepage": "http://github.com/andrewdavey/vogue",
-  "repository": "http://github.com/andrewdavey/vogue.git",
+  "version": "0.5",
+  "homepage": "http://github.com/quizlet/vogue",
+  "repository": "http://github.com/quizlet/vogue.git",
   "author": "Andrew Davey <andrew@equin.co.uk> (http://aboutcode.net/)",
+  "contributors": [
+    { "name": "Andrew Sutherland", "email": "andrew@quizlet.com"},
+  ],
   "directories": {
     "lib": ""
   },
@@ -15,7 +18,7 @@
     "vogue": "./vogue.js"
   },
   "dependencies": {
-    "socket.io": "0.7.x",
+    "socket.io": "0.9.x",
     "parseopt": ">=1.0.0"
   }
 }
