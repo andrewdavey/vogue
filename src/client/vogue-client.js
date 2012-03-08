@@ -24,15 +24,14 @@
             var sheet = document.createElement('style');
             
             sheet.setAttribute("type", "text/css");
-            document.getElementsByTagName('head')[0].appendChild(sheet);
             if (sheet.styleSheet) {   // IE
                 sheet.styleSheet.cssText = this.responseText;
             } else { // the world
                 sheet.appendChild(document.createTextNode(this.responseText));
             }
-            
-            stylesheets[this.base_href].parentNode.removeChild(stylesheets[this.base_href]);
-            
+            // replace the old stylesheet with the new
+            stylesheets[this.base_href].parentNode.replaceChild(sheet, stylesheets[this.base_href]);
+                      
             stylesheets[this.base_href] = sheet;
             // make it look like a <link> tag
             sheet.href = this.base_href;
