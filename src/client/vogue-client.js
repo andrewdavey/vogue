@@ -1,6 +1,7 @@
 // Vogue - Client
 // Copyright (c) 2011 Andrew Davey (andrew@equin.co.uk)
 (function () {
+
   var script,
       hop = Object.prototype.hasOwnProperty,
       head = document.getElementsByTagName("head")[0];
@@ -19,8 +20,6 @@
         ajax.base_href = href;
         ajax.onreadystatechange = function(){
           if (this.readyState == 4){
-            stylesheets[this.base_href].parentNode.removeChild(stylesheets[this.base_href]);
-            
             // http://www.phpied.com/dynamic-script-and-style-elements-in-ie/
             var sheet = document.createElement('style');
             
@@ -31,6 +30,9 @@
             } else { // the world
                 sheet.appendChild(document.createTextNode(this.responseText));
             }
+            
+            stylesheets[this.base_href].parentNode.removeChild(stylesheets[this.base_href]);
+            
             stylesheets[this.base_href] = sheet;
             // make it look like a <link> tag
             sheet.href = this.base_href;
