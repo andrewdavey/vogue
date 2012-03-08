@@ -3,8 +3,9 @@
 (function () {
 
   var script,
-      hop = Object.prototype.hasOwnProperty,
-      head = document.getElementsByTagName("head")[0];
+	hop = Object.prototype.hasOwnProperty,
+	head = document.getElementsByTagName("head")[0],
+	broken_sheet_popups = {};
 
   function vogue() {
     var stylesheets,
@@ -20,6 +21,22 @@
         ajax.base_href = href;
         ajax.onreadystatechange = function(){
           if (this.readyState == 4){
+			var match = this.responseText.match(/ParseError: ([^:]+):(\d+)/);
+			// if we get a parse error, pop up it up and don't return the error
+			if (match) {
+				broken_sheet_popups[this.base_href] = window.open(this.base_href, "_blank", "height=650,width=800,toolbar=0");
+				var txmt = window.open('txmt://open/?url='+escape('file://'+match[1])+"&line="+match[2], "_blank", "height=100,left=0,top=0,width=100,toolbar=0");
+				setTimeout(function() {
+					txmt.close();
+				}, 100);
+				return;
+			} else {
+				if (broken_sheet_popups.hasOwnProperty(this.base_href)) {
+					broken_sheet_popups[this.base_href].close();
+					delete broken_sheet_popups[this.base_href];
+				}
+			}
+	
             // http://www.phpied.com/dynamic-script-and-style-elements-in-ie/
             var sheet = document.createElement('style');
             
