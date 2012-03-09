@@ -152,20 +152,24 @@
           stylesheets[href] = link;
         }
       }
-
+      
       // Go through stylesheet rules looking for @import
       var allStyleSheets = document.styleSheets;
+      
       function recursivelyAddImportedStylesheets(styleSheet) {
         var rules;
         // The try {} will catch security errors when trying to get cssRules
         // from cross domain stylesheets
+        
         try {
-          rules = styleSheet.rules || styleSheet.cssRules;
+          rules = styleSheet.cssRules || styleSheet.rules;
         } catch (e) {}
+        
         if ( ! rules ) return;
+        
         for ( var i = 0, rule; rule = rules[i]; i++ ) {
           if ( rule.href ) {
-            var h = rule.href;
+            var h = getBase(rule.href) || rule.href;
             stylesheets[h] = {rel: "stylesheet", href: h};
             imported[h] = {styleSheet: styleSheet, index: i};
             recursivelyAddImportedStylesheets(rule.styleSheet);
