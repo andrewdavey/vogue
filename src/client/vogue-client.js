@@ -248,19 +248,6 @@
     }
   }
 
-  /**
-   * Fetches the port from the URL.
-   *
-   * @param {String} url URL to get the port from
-   * @returns {Number} The port number, or 80 if no port number found or is invalid.
-   */
-  function getPort(url) {
-    // URL may contain the port number after the second colon.
-    // http://domain:1234/
-    var index = url.indexOf(":", 6); // skipping 6 characters to ignore first colon
-    return index < 0 ? 80 : parseInt(url.substr(index + 1), 10);
-  }
-
   script = getScriptInfo();
   loadScripts({
     io: script.rootUrl + "socket.io/socket.io.js"
