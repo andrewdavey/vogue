@@ -6,7 +6,7 @@
   "repository": "http://github.com/quizlet/vogue.git",
   "author": "Andrew Davey <andrew@equin.co.uk> (http://aboutcode.net/)",
   "contributors": [
-    { "name": "Andrew Sutherland", "email": "andrew@quizlet.com"},
+    { "name": "Andrew Sutherland", "email": "andrew@quizlet.com"}
   ],
   "directories": {
     "lib": ""
