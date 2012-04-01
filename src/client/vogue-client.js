@@ -25,10 +25,6 @@
 			// if we get a parse error, pop up it up and don't return the error
 			if (match) {
 				broken_sheet_popups[this.base_href] = window.open(this.base_href, "_blank", "height=650,width=800,toolbar=0");
-				var txmt = window.open('txmt://open/?url='+escape('file://'+match[1])+"&line="+match[2], "_blank", "height=100,left=0,top=0,width=100,toolbar=0");
-				setTimeout(function() {
-					txmt.close();
-				}, 100);
 				return;
 			} else {
 				if (broken_sheet_popups.hasOwnProperty(this.base_href)) {
