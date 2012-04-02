@@ -10,9 +10,51 @@
 
 	function vogue() {
 		var stylesheets,
-		socket = io.connect(script.rootUrl);
-
+		socket = io.connect(script.rootUrl),
+		finishedLoadingCount,
+		sheetCount = 0,
+		loaderTimer;
+			
+		// when stylesheets are being loaded, add a dot on the screen
+		// to indicate vogue progress
+		function animateLoader() {
+			if (++finishedLoadingCount !== sheetCount)
+				return;
+				
+			loader.style.background = '#0965d6';
+			loader.style.border = '2px solid #cfe4ff';
+			loaderTimer = setTimeout(function() {
+				var opacity = 1;
+				// old school tweening to work in all browsers
+				loaderTimer = setInterval(function() {
+					opacity -= .05;
+					loader.style.filter = 'alpha(opacity=' + opacity*100 + ')';
+					loader.style.opacity = opacity;
+					if (opacity === 0) {
+						resetLoader();
+					}
+				}, 30);
+			}, 500);
+		}
+		
+		function resetLoader() {
+			// could be either a timeout or an interval, so clear both
+			clearInterval(loaderTimer);
+			clearTimeout(loaderTimer);
+			loader.setAttribute('style', 'display: none; opacity: 1; filter: alpha(opacity=100); background: #e6df27; position: absolute; top: 60px; right: 60px; z-index: 9999; height: 15px; width: 15px; border-radius: 15px; border: 2px solid #aba623;');
+		}
+		
+		var loader = document.createElement('div');
+		loader.setAttribute('id', 'vogueLoader');
+		resetLoader();
+		document.getElementsByTagName('body')[0].appendChild(loader);
+				
 		function updateAllStylesheets() {
+			
+			finishedLoadingCount = 0;
+			resetLoader();
+			loader.style.display = 'block';
+			
 			for (href in stylesheets) {
 				if (hop.call(stylesheets, href)) {
 					// use ajax to download contents of CSS
@@ -20,6 +62,7 @@
 					var new_url = stylesheets[href].href + (stylesheets[href].href.indexOf('?') === -1 ? "?": "&") + "_vogue_rand=" + Math.random();
 					var ajax = new XMLHttpRequest();
 					ajax.base_href = href;
+					
 					ajax.onreadystatechange = function() {
 						if (this.readyState == 4) {
 							var match = this.responseText.match(/ParseError: ([^:]+):(\d+)/);
@@ -51,10 +94,12 @@
 							stylesheets[this.base_href] = sheet;
 							// make it look like a <link> tag
 							sheet.href = this.base_href;
+							
+							animateLoader();
 						}
 					}
 					ajax.open("GET", new_url, true);
-					ajax.send(null);
+					ajax.send(null);					
 				}
 			}
 		}
@@ -142,6 +187,7 @@
 				href = getBase(link.href);
 				if (href !== false) {
 					stylesheets[href] = link;
+					sheetCount++;
 				}
 			}
 
@@ -161,6 +207,7 @@
 						href = getBase(link.href);
 						if (href !== false) {
 							stylesheets[href] = link;
+							sheetCount++;
 						}
 					}
 				}
