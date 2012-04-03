@@ -41,7 +41,7 @@
 			// could be either a timeout or an interval, so clear both
 			clearInterval(loaderTimer);
 			clearTimeout(loaderTimer);
-			loader.setAttribute('style', 'display: none; opacity: 1; filter: alpha(opacity=100); background: #e6df27; position: absolute; top: 60px; right: 60px; z-index: 9999; height: 15px; width: 15px; border-radius: 15px; border: 2px solid #aba623;');
+			loader.setAttribute('style', 'display: none; opacity: 1; filter: alpha(opacity=100); background: #e6df27; position: absolute; top: 60px; left: 60px; z-index: 9999; height: 20px; width: 20px; border-radius: 20px; border: 2px solid #aba623;');
 		}
 		
 		var loader = document.createElement('div');
