@@ -30,7 +30,8 @@
 					opacity -= .05;
 					loader.style.filter = 'alpha(opacity=' + opacity*100 + ')';
 					loader.style.opacity = opacity;
-					if (opacity === 0) {
+					// javascript rounding errors make it possible to get <= 0
+					if (opacity <= 0) {
 						resetLoader();
 					}
 				}, 30);
