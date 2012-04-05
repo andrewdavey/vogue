@@ -9,50 +9,102 @@
  * browser and server.
  */
 
-var http = require('http')
-  , fs   = require('fs')
-  , path = require('path')
-  , url  = require('url')
-  , opt  = require('parseopt')
-  , io   = require('socket.io');
+var http  = require('http')
+  , fs    = require('fs')
+  , path  = require('path')
+  , url   = require('url')
+  , opt   = require('parseopt')
+  , io    = require('socket.io');
 
-var VogueClient = require('./VogueClient').VogueClient
-  , Watcher     = require('./Watcher').Watcher;
-
-var options = getOptions()
-  , server  = http.createServer(handleHttpRequest)
-  , socket  = io.listen(server)
-  , watcher = new Watcher(options.webDirectory,options.rewrite);
+var options    = getOptions()
+  , server     = http.createServer(handleHttpRequest)
+  , socket     = io.listen(server);
 
 server.listen(options.port);
-socket.sockets.on('connection', function(clientSocket) {
-  watcher.addClient(new VogueClient(clientSocket, watcher));
-});
 
 console.log('Watching directory: ' + options.webDirectory);
 console.log('Listening for clients: http://localhost:' + options.port + '/');
 
-
-function handleHttpRequest(request, response) {
-  var pathname = url.parse(request.url).pathname;
-  if (pathname === '/') {
-    sendAboutPage(response);
-  } else if (pathname === '/vogue-client.js') {
-    sendVogueClient(response);
+if (options.key !== null) {
+  console.log('Listening for SSL clients: https://localhost:' + options.sslPort + '/');
+  
+  https = require('https');
+  var ssl_opts = {
+    cert: fs.readFileSync(options.cert),
+    key: fs.readFileSync(options.key)
+  };
+  if (options.ca !== null) {
+    ssl_opts.ca = fs.readFileSync(options.ca);
   }
+  server_ssl = https.createServer(ssl_opts, handleHttpRequest);
+  
+  socket_ssl = io.listen(server_ssl);
+  server_ssl.listen(options.sslPort);
 }
 
-function sendAboutPage(response) {
-  fs.readFile(__dirname + '/client/about.htm', function(e, fileData) {
-    var html = fileData.toString();
-    html = html.replace(/\{port\}/g, options.port.toString());
-    response.writeHead(200, { 'Content-Type': 'text/html' });
-    response.write(html);
-    response.end();
+var walk = function(dir, done) {
+  var results = [];
+  fs.readdir(dir, function(err, list) {
+    if (err) return done(err);
+    var i = 0;
+    (function next() {
+      var file = list[i++];
+      if (!file) return done(null, results);
+      file = dir + '/' + file;
+      fs.stat(file, function(err, stat) {
+        if (stat && stat.isDirectory()) {
+          walk(file, function(err, res) {
+            results = results.concat(res);
+            next();
+          });
+        } else {
+          results.push(file);
+          next();
+        }
+      });
+    })();
+  });
+};
+
+var watching = {};
+function watchAllFiles() {
+  var newFiles = [];
+  // watch every file in the whole directory we're put to
+  walk(options.webDirectory, function(err, list) {
+  	list.forEach(function(file) {
+  	  if (!Object.prototype.hasOwnProperty.call(watching, file)) {
+  	    fs.watchFile(file, {interval: 2000}, onFileChange.bind(file));
+  	    watching[file] = 'normal';
+  	    newFiles.push(file);
+  	  }
+  	})
+  	console.log('Now watching '+newFiles.length+' new files');
   });
 }
 
-function sendVogueClient(response) {
+watchAllFiles();
+// refresh file tree every N seconds (TODO: watch directory for new files?)
+setInterval(watchAllFiles, 20000);
+
+function onFileChange(cur, prev) {
+	if (cur.mtime.toString() != prev.mtime.toString()) {
+		socket.sockets.emit('update');
+		if (typeof socket_ssl !== 'undefined') {
+		  socket_ssl.sockets.emit('update');
+		}
+		// not sure why the filename gets turned into an object?
+		var file = this.toString();
+		// put this particular file on high-alert for changes
+		// (reduce the polling interval)
+		if (watching[file] === 'normal') {
+		  fs.unwatchFile(this.toString());
+      fs.watchFile(this.toString(), {interval: 100}, onFileChange.bind(this.toString()));
+  		watching[file] = 'hyperspeed';  
+		}
+	}
+}
+
+function handleHttpRequest(request, response) {
   fs.readFile(__dirname + '/client/vogue-client.js', function(e, fileData) {
     var script = fileData.toString();
     response.writeHead(200, { 'Content-Type': 'text/javascript' });
@@ -76,8 +128,32 @@ function getOptions() {
         {
           name: ['--port', '-p'],
           type: 'int',
-          help: 'Port to run Vogue server on',
+          help: 'Port to run Vogue server on (http)',
           'default': 8001
+        },
+        {
+          name: ['--ssl_port', '-s'],
+          type: 'int',
+          help: 'Port to run the Vogue server on (https) (optional)',
+          'default': 8002
+        },
+        {
+		      name: ['--key', '-k'],
+		      type: 'string',
+		      help: 'A private key file (.pem format) (optional)',
+		      'default': null
+        },
+        {
+		      name: ['--cert', '-c'],
+		      type: 'string',
+		      help: 'A certificate file (.pem format) (optional)',
+		      'default': null
+        },
+        {
+		      name: ['--ca', '-a'],
+		      type: 'string',
+		      help: 'A intermediate certificate file (.pem format) (optional)',
+		      'default': null
         },
         {
           name: ['--rewrite', '-r'],
