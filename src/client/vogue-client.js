@@ -66,6 +66,14 @@
 					
 					ajax.onreadystatechange = function() {
 						if (this.readyState == 4) {
+							
+							// popup windows can exist but be null
+							// close the old popup before opening a new one
+							if (hop.call(broken_sheet_popups, this.base_href) && broken_sheet_popups[this.base_href]) {
+								broken_sheet_popups[this.base_href].close();
+								delete broken_sheet_popups[this.base_href];
+							}
+
 							// look for Stylus parse errors 
 							// (this isn't a stylus dependency, just an added feature for stylus)
 							var match = this.responseText.match(/ParseError: ([^:]+):(\d+)/);
@@ -73,11 +81,6 @@
 							if (match) {
 								broken_sheet_popups[this.base_href] = window.open(this.base_href, "_blank", "height=650,width=800,toolbar=0");
 								return;
-							
-							// popup windows can exist but be null
-							} else if (hop.call(broken_sheet_popups, this.base_href) && broken_sheet_popups[this.base_href]) {
-								broken_sheet_popups[this.base_href].close();
-								delete broken_sheet_popups[this.base_href];
 							}
 
 							// http://www.phpied.com/dynamic-script-and-style-elements-in-ie/
