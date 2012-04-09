@@ -230,7 +230,7 @@
       scripts = document.getElementsByTagName("script");
       for (var i=0; i < scripts.length; i++) {
         src = scripts[i].getAttribute("src");
-        if (src.slice(-15) === 'vogue-client.js') break;
+        if (src && src.slice(-15) === 'vogue-client.js') break;
       }
       rootUrl = src.match(/^https?\:\/\/(.*?)\//)[0];
       // There is an optional base argument, that can be used.
