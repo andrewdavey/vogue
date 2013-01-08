@@ -9,6 +9,8 @@
     var stylesheets,
         socket = io.connect(script.rootUrl);
 
+    var imported = {};
+
     /**
      * Watch for all available stylesheets.
      */
@@ -29,12 +31,26 @@
      * @param {String} href The URL of the stylesheet to be reloaded.
      */
     function reloadStylesheet(href) {
-      var newHref = stylesheets[href].href +
+      var newHref = href +
             (href.indexOf("?") >= 0 ? "&" : "?") +
             "_vogue_nocache=" + (new Date).getTime(),
           stylesheet;
+      
       // Check if the appropriate DOM Node is there.
       if (!stylesheets[href].setAttribute) {
+        // If the stylesheet is from an @import, remove it
+        // as a "rule" and add it as a normal stylesheet
+        if (imported[href]) {
+          var styleSheet = imported[href].styleSheet;
+          var index = imported[href].index;
+          // deleteRule is standard way of removing rules, removeRule is for IE
+          if (styleSheet.deleteRule)
+            styleSheet.deleteRule(index);
+          else if (styleSheet.removeRule)
+            styleSheet.removeRule(index);
+          delete imported[href];
+        }
+        
         // Create the link.
         stylesheet = document.createElement("link");
         stylesheet.setAttribute("rel", "stylesheet");
@@ -122,7 +138,6 @@
       }
 
       var stylesheets = {},
-          reImport = /@import\s+url\(["']?([^"'\)]+)["']?\)/g,
           links = document.getElementsByTagName("link"),
           link, href, matches, content, i, m;
 
@@ -137,27 +152,33 @@
           stylesheets[href] = link;
         }
       }
-
-      // Go through all the style tags, looking for @import tags.
-      links = document.getElementsByTagName("style");
-      for (i = 0, m = links.length; i < m; i += 1) {
-        if (isPrintStylesheet(links[i])) continue;
-        content = links[i].text || links[i].textContent;
-        while ((matches = reImport.exec(content))) {
-          link = {
-            rel: "stylesheet",
-            href: matches[1],
-            getAttribute: getProperty
-          };
-          if (isLocalStylesheet(link)) {
-            // Link is local, get the base URL.
-            href = getBase(link.href);
-            if (href !== false) {
-              stylesheets[href] = link;
-            }
+      
+      // Go through stylesheet rules looking for @import
+      var allStyleSheets = document.styleSheets;
+      
+      function recursivelyAddImportedStylesheets(styleSheet) {
+        var rules;
+        // The try {} will catch security errors when trying to get cssRules
+        // from cross domain stylesheets
+        
+        try {
+          rules = styleSheet.cssRules || styleSheet.rules;
+        } catch (e) {}
+        
+        if ( ! rules ) return;
+        
+        for ( var i = 0, rule; rule = rules[i]; i++ ) {
+          if ( rule.href ) {
+            var h = getBase(rule.href) || rule.href;
+            stylesheets[h] = {rel: "stylesheet", href: h};
+            imported[h] = {styleSheet: styleSheet, index: i};
+            recursivelyAddImportedStylesheets(rule.styleSheet);
           }
         }
       }
+      for ( var i = 0, sheet; sheet = allStyleSheets[i]; i++)
+        recursivelyAddImportedStylesheets(sheet);
+      
       return stylesheets;
     }
 
