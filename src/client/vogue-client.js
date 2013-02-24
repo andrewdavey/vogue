@@ -14,13 +14,13 @@
 		finishedLoadingCount,
 		sheetCount = 0,
 		loaderTimer;
-			
+
 		// when stylesheets are being loaded, add a dot on the screen
 		// to indicate vogue progress
 		function animateLoader() {
 			if (++finishedLoadingCount !== sheetCount)
 				return;
-				
+
 			loader.style.background = '#0965d6';
 			loader.style.border = '2px solid #cfe4ff';
 			loaderTimer = setTimeout(function() {
@@ -37,25 +37,25 @@
 				}, 30);
 			}, 500);
 		}
-		
+
 		function resetLoader() {
 			// could be either a timeout or an interval, so clear both
 			clearInterval(loaderTimer);
 			clearTimeout(loaderTimer);
 			loader.setAttribute('style', 'display: none; opacity: 1; filter: alpha(opacity=100); background: #e6df27; position: absolute; top: 60px; left: 60px; z-index: 9999; height: 20px; width: 20px; border-radius: 20px; border: 2px solid #aba623;');
 		}
-		
+
 		var loader = document.createElement('div');
 		loader.setAttribute('id', 'vogueLoader');
 		resetLoader();
 		document.getElementsByTagName('body')[0].appendChild(loader);
-				
+
 		function updateAllStylesheets() {
-			
+
 			finishedLoadingCount = 0;
 			resetLoader();
 			loader.style.display = 'block';
-			
+
 			for (href in stylesheets) {
 				if (hop.call(stylesheets, href)) {
 					// use ajax to download contents of CSS
@@ -63,10 +63,10 @@
 					var new_url = stylesheets[href].href + (stylesheets[href].href.indexOf('?') === -1 ? "?": "&") + "_vogue_rand=" + Math.random();
 					var ajax = new XMLHttpRequest();
 					ajax.base_href = href;
-					
+
 					ajax.onreadystatechange = function() {
 						if (this.readyState == 4) {
-							
+
 							// popup windows can exist but be null
 							// close the old popup before opening a new one
 							if (hop.call(broken_sheet_popups, this.base_href) && broken_sheet_popups[this.base_href]) {
@@ -74,7 +74,7 @@
 								delete broken_sheet_popups[this.base_href];
 							}
 
-							// look for Stylus parse errors 
+							// look for Stylus parse errors
 							// (this isn't a stylus dependency, just an added feature for stylus)
 							var match = this.responseText.match(/ParseError: ([^:]+):(\d+)/);
 							// if we get a parse error, pop up it up and don't return the error
@@ -100,12 +100,12 @@
 							stylesheets[this.base_href] = sheet;
 							// make it look like a <link> tag
 							sheet.href = this.base_href;
-							
+
 							animateLoader();
 						}
 					}
 					ajax.open("GET", new_url, true);
-					ajax.send(null);					
+					ajax.send(null);
 				}
 			}
 		}
@@ -127,7 +127,7 @@
 				var href,
 					i,
 					isExternal = true;
-				
+
 				if (link.getAttribute("rel") !== "stylesheet") {
 					return false;
 				}
