@@ -2,8 +2,8 @@
 /* vogue.js
  * A tool for web developers. Vogue watches for changes to CSS files and
  * informs the web browser using them to reload those stylesheets.
- * 
- * Created by Andrew Davey ~ http://aboutcode.net 
+ *
+ * Created by Andrew Davey ~ http://aboutcode.net
  *
  * Vogue runs on nodeJS and uses socket.io for real-time communication between
  * browser and server.
@@ -22,12 +22,12 @@ var options    = getOptions()
 
 server.listen(options.port);
 
-console.log('Watching directory: ' + options.webDirectory);
+console.log('Watching directory: ' + options.webDirectories.join(', '));
 console.log('Listening for clients: http://localhost:' + options.port + '/');
 
 if (options.key !== null) {
   console.log('Listening for SSL clients: https://localhost:' + options.sslPort + '/');
-  
+
   https = require('https');
   var ssl_opts = {
     cert: fs.readFileSync(options.cert),
@@ -37,7 +37,7 @@ if (options.key !== null) {
     ssl_opts.ca = fs.readFileSync(options.ca);
   }
   server_ssl = https.createServer(ssl_opts, handleHttpRequest);
-  
+
   socket_ssl = io.listen(server_ssl);
   server_ssl.listen(options.sslPort);
 }
@@ -70,15 +70,17 @@ var watching = {};
 function watchAllFiles() {
   var newFiles = [];
   // watch every file in the whole directory we're put to
-  walk(options.webDirectory, function(err, list) {
-  	list.forEach(function(file) {
-  	  if (!Object.prototype.hasOwnProperty.call(watching, file)) {
-  	    fs.watchFile(file, {interval: 2000}, onFileChange.bind(file));
-  	    watching[file] = 'normal';
-  	    newFiles.push(file);
-  	  }
-  	})
-  	console.log('Now watching '+newFiles.length+' new files');
+  options.webDirectories.forEach(function(dir) {
+    walk(dir, function(err, list) {
+    	list.forEach(function(file) {
+    	  if (!Object.prototype.hasOwnProperty.call(watching, file)) {
+    	    fs.watchFile(file, {interval: 2000}, onFileChange.bind(file));
+    	    watching[file] = 'normal';
+    	    newFiles.push(file);
+    	  }
+    	})
+    	console.log('Now watching '+newFiles.length+' new files');
+    });
   });
 }
 
@@ -99,7 +101,7 @@ function onFileChange(cur, prev) {
 		if (watching[file] === 'normal') {
 		  fs.unwatchFile(this.toString());
       fs.watchFile(this.toString(), {interval: 100}, onFileChange.bind(this.toString()));
-  		watching[file] = 'hyperspeed';  
+  		watching[file] = 'hyperspeed';
 		}
 	}
 }
@@ -119,7 +121,7 @@ function getOptions() {
 
   // The directory to watch is given as the first argument after the options.
   // So we'll put it into the options we return for simplicity.
-  data.options.webDirectory = getDirectoryToWatch(data.arguments);
+  data.options.webDirectories = getDirectoriesToWatch(data.arguments);
   return data.options;
 
   function createOptionParser() {
@@ -156,12 +158,6 @@ function getOptions() {
 		      'default': null
         },
         {
-          name: ['--rewrite', '-r'],
-          type: 'string',
-          help: 'Expression of the form "regexp:replacement" rewrites a URL path into a file system path, relative to the website root directory. For example: --rewrite "v[0-9]/(.*)$:files/\\$1" would change "v1/demo.css" to "files/demo.css".',
-          'default': null
-        },
-        {
           name: ['--help','-h','-?'],
           type: 'flag',
           help: 'Show this help message',
@@ -179,29 +175,35 @@ function getOptions() {
     return parser;
   }
 
-  function getDirectoryToWatch(arguments) {
+  function getDirectoriesToWatch(arguments) {
     var dir;
     if (arguments.length > 0) {
       if (/^\//.test(arguments[0])) {
-        dir = arguments[0];
+        dirs = arguments[0];
       } else {
-        dir = path.join(process.cwd(), arguments[0]);
+        dirs = path.join(process.cwd(), arguments[0]);
       }
     } else {
-      dir = process.cwd();
+      dirs = process.cwd();
     }
 
-    try {
-      var stats = fs.statSync(dir);
-      if (!stats.isDirectory()) {
-        console.error('Path is not a directory: ' + dir);
-        process.exit(1);
+    dirs = dirs.split(':');
+
+    for (var i = 0, m = dirs.length; i < m; i++) {
+      var dir = dirs[i];
+          try {
+            var stats = fs.statSync(dir);
+            if (!stats.isDirectory()) {
+              console.error('Path is not a directory: ' + dir);
+              process.exit(1);
+            }
+          } catch (e) {
+           console.error('Path not found: ' + dir);
+           process.exit(1);
+          }
       }
-    } catch (e) {
-      console.error('Path not found: ' + dir);
-      process.exit(1);
-    }
 
-    return dir;
+
+    return dirs;
   }
 }
