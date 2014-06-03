@@ -1,6 +1,7 @@
 // Vogue - Client
 // Original Copyright (c) 2011 Andrew Davey (andrew@equin.co.uk)
-// Adapted and rewritten by Quizlet (github.com/quizet.com/vogue)
+// Adapted and rewritten by Quizlet (github.com/quizlet/vogue)
+
 (function() {
 
 	var script,
@@ -9,8 +10,9 @@
 		broken_sheet_popups = {};
 
 	function vogue() {
+		console.log('VOGUE ' + script.rootUrl)
 		var stylesheets,
-		socket = io.connect(script.rootUrl),
+		socket = io.connect(script.rootUrl, {resource: 'vogue/socket.io'}),
 		finishedLoadingCount,
 		sheetCount = 0,
 		loaderTimer;
@@ -51,6 +53,7 @@
 		document.getElementsByTagName('body')[0].appendChild(loader);
 
 		function updateAllStylesheets() {
+			console.log('UPDATE STYLESHEETS')
 
 			finishedLoadingCount = 0;
 			resetLoader();
@@ -222,7 +225,9 @@
 		}
 
 		stylesheets = getLocalStylesheets();
-		socket.on("update", updateAllStylesheets);
+		console.log('setting hook')
+		socket.on("update", function(){alert('here')});
+		socket.on("name", function(){alert('foo')})
 	}
 
 	/**
@@ -298,7 +303,7 @@
 				src = scripts[i].getAttribute("src");
 				if (src && src.slice( - 15) === 'vogue-client.js') break;
 			}
-			rootUrl = src.match(/^(?:https?\:)?\/\/(.*?)\//)[0];
+			rootUrl = src.match(/^(?:https?\:)?\/\/(.*?)vogue-client\.js$/)[1];
 			// There is an optional base argument, that can be used.
 			baseMatch = src.match(/\bbase=(.*)(&|$)/);
 
@@ -317,7 +322,7 @@
 
 	script = getScriptInfo();
 	loadScripts({
-		io: script.rootUrl + "socket.io/socket.io.js"
+		io: window.location.protocol + '//' + script.rootUrl + "socket.io/socket.io.js"
 	},
 	vogue);
 } ());

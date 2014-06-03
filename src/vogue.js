@@ -90,6 +90,7 @@ setInterval(watchAllFiles, 20000);
 
 function onFileChange(cur, prev) {
 	if (cur.mtime.toString() != prev.mtime.toString()) {
+    console.log('Update to file: ' + this.toString());
 		socket.sockets.emit('update');
 		if (typeof socket_ssl !== 'undefined') {
 		  socket_ssl.sockets.emit('update');
