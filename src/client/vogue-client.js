@@ -10,9 +10,8 @@
 		broken_sheet_popups = {};
 
 	function vogue() {
-		console.log('VOGUE ' + script.rootUrl)
 		var stylesheets,
-		socket = io.connect(script.rootUrl, {resource: 'vogue/socket.io'}),
+		socket = io(script.rootUrl, {path: '/vogue/socket.io'}),
 		finishedLoadingCount,
 		sheetCount = 0,
 		loaderTimer;
@@ -53,7 +52,7 @@
 		document.getElementsByTagName('body')[0].appendChild(loader);
 
 		function updateAllStylesheets() {
-			console.log('UPDATE STYLESHEETS')
+			console.log('Updating stylesheets');
 
 			finishedLoadingCount = 0;
 			resetLoader();
@@ -225,9 +224,7 @@
 		}
 
 		stylesheets = getLocalStylesheets();
-		console.log('setting hook')
-		socket.on("update", function(){alert('here')});
-		socket.on("name", function(){alert('foo')})
+		socket.on("update", updateAllStylesheets);
 	}
 
 	/**
@@ -303,7 +300,7 @@
 				src = scripts[i].getAttribute("src");
 				if (src && src.slice( - 15) === 'vogue-client.js') break;
 			}
-			rootUrl = src.match(/^(?:https?\:)?\/\/(.*?)vogue-client\.js$/)[1];
+			rootUrl = src.match(/^(?:https?\:)?\/\/(.*?)\//)[1];
 			// There is an optional base argument, that can be used.
 			baseMatch = src.match(/\bbase=(.*)(&|$)/);
 
@@ -322,7 +319,7 @@
 
 	script = getScriptInfo();
 	loadScripts({
-		io: window.location.protocol + '//' + script.rootUrl + "socket.io/socket.io.js"
+		io: window.location.protocol + '//' + script.rootUrl + "/vogue/socket.io/socket.io.js"
 	},
 	vogue);
 } ());
