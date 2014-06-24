@@ -11,7 +11,6 @@
 
 var http  = require('http')
   , fs    = require('fs')
-  , path  = require('path')
   , url   = require('url')
   , opt   = require('parseopt')
   , io    = require('socket.io');
@@ -22,8 +21,8 @@ var options    = getOptions()
 
 server.listen(options.port);
 
-console.log('Watching directory: ' + options.webDirectories.join(', '));
 console.log('Listening for clients: http://localhost:' + options.port + '/');
+console.log('Listening for SIGUSR2 to trigger updates');
 
 if (options.key !== null) {
   console.log('Listening for SSL clients: https://localhost:' + options.sslPort + '/');
@@ -42,70 +41,12 @@ if (options.key !== null) {
   server_ssl.listen(options.sslPort);
 }
 
-var walk = function(dir, done) {
-  var results = [];
-  fs.readdir(dir, function(err, list) {
-    if (err) return done(err);
-    var i = 0;
-    (function next() {
-      var file = list[i++];
-      if (!file) return done(null, results);
-      file = dir + '/' + file;
-      fs.stat(file, function(err, stat) {
-        if (stat && stat.isDirectory()) {
-          walk(file, function(err, res) {
-            results = results.concat(res);
-            next();
-          });
-        } else {
-          results.push(file);
-          next();
-        }
-      });
-    })();
-  });
-};
-
-var watching = {};
-function watchAllFiles() {
-  var newFiles = [];
-  // watch every file in the whole directory we're put to
-  options.webDirectories.forEach(function(dir) {
-    walk(dir, function(err, list) {
-    	list.forEach(function(file) {
-    	  if (!Object.prototype.hasOwnProperty.call(watching, file)) {
-    	    fs.watchFile(file, {interval: 2000}, onFileChange.bind(file));
-    	    watching[file] = 'normal';
-    	    newFiles.push(file);
-    	  }
-    	})
-    	console.log('Now watching '+newFiles.length+' new files');
-    });
-  });
-}
-
-watchAllFiles();
-// refresh file tree every N seconds (TODO: watch directory for new files?)
-setInterval(watchAllFiles, 20000);
-
-function onFileChange(cur, prev) {
-	if (cur.mtime.toString() != prev.mtime.toString()) {
-    console.log('Update to file: ' + this.toString());
-		socket.sockets.emit('update');
-		if (typeof socket_ssl !== 'undefined') {
-		  socket_ssl.sockets.emit('update');
-		}
-		// not sure why the filename gets turned into an object?
-		var file = this.toString();
-		// put this particular file on high-alert for changes
-		// (reduce the polling interval)
-		if (watching[file] === 'normal') {
-		  fs.unwatchFile(this.toString());
-      fs.watchFile(this.toString(), {interval: 100}, onFileChange.bind(this.toString()));
-  		watching[file] = 'hyperspeed';
-		}
-	}
-}
+process.on("SIGUSR2", function() {
+  socket.sockets.emit('update');
+  if (typeof socket_ssl !== 'undefined') {
+     socket_ssl.sockets.emit('update');
+  }
+});
 
 function handleHttpRequest(request, response) {
   fs.readFile(__dirname + '/client/vogue-client.js', function(e, fileData) {
@@ -174,37 +115,5 @@ function getOptions() {
       ]
     });
     return parser;
-  }
-
-  function getDirectoriesToWatch(arguments) {
-    var dir;
-    if (arguments.length > 0) {
-      if (/^\//.test(arguments[0])) {
-        dirs = arguments[0];
-      } else {
-        dirs = path.join(process.cwd(), arguments[0]);
-      }
-    } else {
-      dirs = process.cwd();
-    }
-
-    dirs = dirs.split(':');
-
-    for (var i = 0, m = dirs.length; i < m; i++) {
-      var dir = dirs[i];
-          try {
-            var stats = fs.statSync(dir);
-            if (!stats.isDirectory()) {
-              console.error('Path is not a directory: ' + dir);
-              process.exit(1);
-            }
-          } catch (e) {
-           console.error('Path not found: ' + dir);
-           process.exit(1);
-          }
-      }
-
-
-    return dirs;
   }
 }
