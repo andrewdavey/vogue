@@ -42,6 +42,7 @@ if (options.key !== null) {
 }
 
 process.on("SIGUSR2", function() {
+  console.log("Heard SIGUSR2");
   socket.sockets.emit('update');
   if (typeof socket_ssl !== 'undefined') {
      socket_ssl.sockets.emit('update');
@@ -61,9 +62,6 @@ function getOptions() {
   var data = createOptionParser().parse();
   if (!data) process.exit(1); // Some kind of parsing error
 
-  // The directory to watch is given as the first argument after the options.
-  // So we'll put it into the options we return for simplicity.
-  data.options.webDirectories = getDirectoriesToWatch(data.arguments);
   return data.options;
 
   function createOptionParser() {
