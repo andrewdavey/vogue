@@ -52,7 +52,10 @@ process.on("SIGUSR2", function() {
 function handleHttpRequest(request, response) {
   fs.readFile(__dirname + '/client/vogue-client.js', function(e, fileData) {
     var script = fileData.toString();
-    response.writeHead(200, { 'Content-Type': 'text/javascript' });
+    response.writeHead(200, {
+    	'Content-Type': 'text/javascript',
+    	'Cache-Control':	'public, max-age=315360000',
+    });
     response.write(script);
     response.end();
   });
