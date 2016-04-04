@@ -18,7 +18,7 @@
     "vogue": "./vogue.js"
   },
   "dependencies": {
-    "socket.io": "1.0.3",
+    "socket.io": "1.4.5",
     "parseopt": ">=1.0.0"
   }
 }
